@@ -1,0 +1,26 @@
+@import "tailwindcss";
+@import "../static/catppuccin.css";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "JetBrains Mono Variable", monospace;
+}
+
+@layer utilities {
+  .scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-accent) transparent;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 100vh;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in oklch, currentColor, var(--color-mantle));
+  }
+}
+
+@utility link {
+  @apply text-accent hover:bg-accent hover:text-mantle decoration-dashed underline-offset-4 duration-200 not-hover:underline;
+}
