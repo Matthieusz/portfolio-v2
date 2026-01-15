@@ -6,11 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "fmt": "oxfmt",
-    "fmt:check": "oxfmt --check",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix"
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/node": "^9.5.1",
