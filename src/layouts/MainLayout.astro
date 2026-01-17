@@ -1,0 +1,23 @@
+---
+import Header from "@/components/Header.astro";
+import "../styles/global.css";
+import Footer from "@/components/Footer.astro";
+---
+
+<html
+  lang="en"
+  class="dark selection:bg-primary/30 selection:text-primary/80 caret-accent scrollbar font-mono"
+>
+  <head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta name="viewport" content="width=device-width">
+    <meta name="generator" content={Astro.generator}>
+    <title>Mateusz Irski</title>
+  </head>
+  <body class="mx-auto max-w-[90%] md:max-w-[80%] flex flex-col min-h-screen ">
+    <Header />
+    <slot />
+    <Footer />
+  </body>
+</html>
