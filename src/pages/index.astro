@@ -1,23 +1,104 @@
 ---
-import "../global.css";
+import Separator from "@/components/starwind/separator";
+import MainLayout from "@/layouts/MainLayout.astro";
 ---
 
-<html
-  lang="en"
-  class="bg-base text-text selection:bg-accent/30 selection:text-accent/80 caret-accent scrollbar min-h-screen font-mono"
->
-  <head>
-    <meta charset="utf-8">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="viewport" content="width=device-width">
-    <meta name="generator" content={Astro.generator}>
-    <title>Mateusz Irski</title>
-  </head>
-  <body>
-    <div
-      class="container mx-auto flex flex-col items-center justify-center min-h-screen text-5xl"
-    >
-      <h1>Hello World!</h1>
+<MainLayout>
+  <main class="pt-16">
+    <div class="mx-auto max-w-6xl">
+      <section>
+        <h1 class="text-3xl font-bold md:text-4xl">
+          Hey! I'm <span class="text-primary">Mateusz Irski</span>
+        </h1>
+        <p class="mt-4 max-w-prose text-lg leading-relaxed">
+          I am currently studying at
+          <span
+            ><a
+              href="https://www.put.poznan.pl/en/"
+              class="link-underline"
+              target="_blank">Poznań University of Technology</a
+            ></span
+          >. I've written software that solved real problems, really well. Let's
+          build something amazing together!
+        </p>
+      </section>
+      <section class="mt-8">
+        <div class="text-muted-foreground flex items-center gap-4 text-sm">
+          <span class="flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="icon icon-tabler icons-tabler-outline icon-tabler-brand-github"
+              ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
+                d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5"
+              ></path></svg
+            >
+            <a
+              href="https://github.com/Matthieusz"
+              target="_blank"
+              class="hover:text-primary transition-colors duration-250"
+              >Github</a
+            >
+          </span>
+          <Separator orientation="vertical" class="h-5" />
+          <span class="flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="icon icon-tabler icons-tabler-outline icon-tabler-brand-linkedin"
+              ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
+                d="M8 11v5"></path><path d="M8 8v.01"></path><path d="M12 16v-5"
+              ></path><path d="M16 16v-3a2 2 0 1 0 -4 0"></path><path
+                d="M3 7a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v10a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4l0 -10"
+              ></path></svg
+            >
+            <a
+              href="https://www.linkedin.com/in/mateusz-irski-61a593248/"
+              target="_blank"
+              class="hover:text-primary transition-colors duration-250"
+              >LinkedIn</a
+            >
+          </span>
+          <Separator orientation="vertical" class="h-5" />
+          <span>
+            <a
+              href="/about"
+              class="hover:text-primary flex items-center gap-2 transition-colors duration-250"
+            >
+              More about me
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-narrow-right"
+                ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
+                  d="M5 12l14 0"></path><path d="M15 16l4 -4"></path><path
+                  d="M15 8l4 4"></path></svg
+              >
+            </a>
+          </span>
+        </div>
+      </section>
     </div>
-  </body>
-</html>
+  </main>
+</MainLayout>
