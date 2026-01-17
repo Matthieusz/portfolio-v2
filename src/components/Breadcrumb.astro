@@ -1,0 +1,69 @@
+---
+const pathname = Astro.url.pathname;
+
+// Split the path and filter out empty segments
+const segments = pathname.split("/").filter((segment) => segment !== "");
+
+// Build the breadcrumb items with href and label
+interface BreadcrumbItem {
+  href: string;
+  label: string;
+}
+
+const breadcrumbs: BreadcrumbItem[] = [{ href: "/", label: "~" }];
+
+let currentPath = "";
+for (const segment of segments) {
+  currentPath += `/${segment}`;
+  breadcrumbs.push({
+    href: currentPath,
+    label: segment,
+  });
+}
+---
+
+<nav aria-label="Breadcrumb" class="flex items-center gap-1 text-lg font-bold">
+  {
+    breadcrumbs.map((crumb, index) => (
+      <>
+        {index > 0 && (
+          <span class="text-muted-foreground select-none" aria-hidden="true">
+            /
+          </span>
+        )}
+        {index === breadcrumbs.length - 1 ? (
+          <span class="text-primary font-medium" aria-current="page">
+            {crumb.label}
+          </span>
+        ) : (
+          <a
+            href={crumb.href}
+            class="text-muted-foreground hover:text-primary transition-colors duration-200"
+          >
+            {crumb.label}
+          </a>
+        )}
+      </>
+    ))
+  }
+  <span class="text-muted-foreground select-none" aria-hidden="true">/</span>
+  <span class="bg-primary animate-blink h-4 w-2" aria-hidden="true"></span>
+</nav>
+
+<style>
+  @keyframes blink {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .animate-blink {
+    animation: blink 1.8s ease-in-out infinite;
+  }
+</style>
