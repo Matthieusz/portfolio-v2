@@ -134,10 +134,10 @@ console.log("Spotify Now Playing Initial Data:", initialData);
         </div>
 
         <!-- Previous & Up Next -->
-        <div class="border-border mt-4 flex flex-col gap-2 border-t pt-3">
+        <div class="border-border mt-4 flex flex-col gap-4 border-t pt-3">
           {/* Previous Track */}
           <div id="spotify-previous" class={`flex items-center gap-3 ${initialData.previousTrack ? '' : 'hidden'}`}>
-            <span class="text-muted-foreground w-16 shrink-0 text-xs">Previous</span>
+            <span class="text-muted-foreground w-16 shrink-0 text-xs uppercase">Previous</span>
             <a
               id="spotify-previous-link"
               href={initialData.previousTrack?.songUrl ?? "#"}
@@ -166,7 +166,7 @@ console.log("Spotify Now Playing Initial Data:", initialData);
 
           {/* Up Next */}
           <div id="spotify-upnext" class={`flex items-center gap-3 ${initialData.upNext ? '' : 'hidden'}`}>
-            <span class="text-muted-foreground w-16 shrink-0 text-xs">Up Next</span>
+            <span class="text-muted-foreground w-16 shrink-0 text-xs uppercase">Up Next</span>
             <a
               id="spotify-upnext-link"
               href={initialData.upNext?.songUrl ?? "#"}
