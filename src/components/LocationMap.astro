@@ -8,7 +8,7 @@ interface Props {
 
 const {
   lat = 52.4064,
-  lng = 16.9152,
+  lng = 16.9352,
   zoom = 12,
   label = "Poznań, Poland",
 } = Astro.props;
@@ -102,18 +102,6 @@ const {
           maxZoom: 19,
         },
       ).addTo(map);
-
-      // Custom marker
-      const markerIcon = L.divIcon({
-        className: "custom-marker",
-        html: `<div class="flex h-6 w-6 items-center justify-center rounded-full bg-primary shadow-lg">
-          <div class="h-2 w-2 rounded-full bg-white"></div>
-        </div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
-      });
-
-      L.marker([lat, lng], { icon: markerIcon }).addTo(map);
     }
   });
 </script>
