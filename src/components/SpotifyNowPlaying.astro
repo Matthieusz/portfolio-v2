@@ -2,7 +2,6 @@
 import { getNowPlaying, type NowPlayingData } from "../lib/spotify";
 
 const initialData = await getNowPlaying();
-console.log("Spotify Now Playing Initial Data:", initialData);
 ---
 
 <div
@@ -149,9 +148,9 @@ console.log("Spotify Now Playing Initial Data:", initialData);
                 id="spotify-previous-img"
                 src={initialData.previousTrack?.albumImageUrl ?? ""}
                 alt=""
-                class="h-8 w-8 shrink-0 rounded"
-                width={32}
-                height={32}
+                class="h-12 w-12 shrink-0 rounded"
+                width={48}
+                height={48}
               />
               <div class="min-w-0 flex-1">
                 <p id="spotify-previous-title" class="text-foreground truncate text-sm font-medium">
@@ -178,9 +177,9 @@ console.log("Spotify Now Playing Initial Data:", initialData);
                 id="spotify-upnext-img"
                 src={initialData.upNext?.albumImageUrl ?? ""}
                 alt=""
-                class="h-8 w-8 shrink-0 rounded"
-                width={32}
-                height={32}
+                class="h-12 w-12 shrink-0 rounded"
+                width={40}
+                height={40}
               />
               <div class="min-w-0 flex-1">
                 <p id="spotify-upnext-title" class="text-foreground truncate text-sm font-medium">
