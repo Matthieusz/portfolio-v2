@@ -9,7 +9,8 @@ const TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token";
 const NOW_PLAYING_ENDPOINT =
 	"https://api.spotify.com/v1/me/player/currently-playing";
 const RECENTLY_PLAYED_ENDPOINT =
-	"https://api.spotify.com/v1/me/player/recently-played?limit=1";
+	"https://api.spotify.com/v1/me/player/recently-played?limit=5";
+const QUEUE_ENDPOINT = "https://api.spotify.com/v1/me/player/queue";
 
 interface SpotifyToken {
 	access_token: string;
@@ -33,6 +34,7 @@ interface SpotifyAlbum {
 }
 
 interface SpotifyTrack {
+	id: string;
 	name: string;
 	artists: SpotifyArtist[];
 	album: SpotifyAlbum;
@@ -53,6 +55,19 @@ interface RecentlyPlayedResponse {
 	}>;
 }
 
+interface QueueResponse {
+	currently_playing: SpotifyTrack | null;
+	queue: SpotifyTrack[];
+}
+
+export interface TrackInfo {
+	title: string;
+	artist: string;
+	album: string;
+	albumImageUrl: string;
+	songUrl: string;
+}
+
 export interface NowPlayingData {
 	isPlaying: boolean;
 	title: string;
@@ -63,6 +78,10 @@ export interface NowPlayingData {
 	progress?: number;
 	duration?: number;
 	playedAt?: string;
+	trackId?: string;
+
+	previousTrack?: TrackInfo;
+	upNext?: TrackInfo;
 }
 
 async function getAccessToken(): Promise<SpotifyToken> {
@@ -80,6 +99,62 @@ async function getAccessToken(): Promise<SpotifyToken> {
 
 	const data = await response.json();
 	return data;
+}
+
+function trackToInfo(track: SpotifyTrack): TrackInfo {
+	return {
+		title: track.name,
+		artist: track.artists.map((a) => a.name).join(", "),
+		album: track.album.name,
+		albumImageUrl: track.album.images[0]?.url ?? "",
+		songUrl: track.external_urls.spotify,
+	};
+}
+
+async function getQueue(
+	accessToken: string,
+): Promise<{ upNext?: TrackInfo } | null> {
+	try {
+		const response = await fetch(QUEUE_ENDPOINT, {
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		});
+
+		if (!response.ok) return null;
+
+		const data: QueueResponse = await response.json();
+
+		return {
+			upNext: data.queue[0] ? trackToInfo(data.queue[0]) : undefined,
+		};
+	} catch {
+		return null;
+	}
+}
+
+async function getRecentTracks(
+	accessToken: string,
+): Promise<{ previousTrack?: TrackInfo } | null> {
+	try {
+		const response = await fetch(RECENTLY_PLAYED_ENDPOINT, {
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		});
+
+		if (!response.ok) return null;
+
+		const data: RecentlyPlayedResponse = await response.json();
+
+		return {
+			previousTrack: data.items[0]
+				? trackToInfo(data.items[0].track)
+				: undefined,
+		};
+	} catch {
+		return null;
+	}
 }
 
 export async function getNowPlaying(): Promise<NowPlayingData | null> {
@@ -113,6 +188,13 @@ export async function getNowPlaying(): Promise<NowPlayingData | null> {
 			return getRecentlyPlayed(access_token);
 		}
 
+
+		// Fetch queue and recent tracks in parallel
+		const [queueData, recentData] = await Promise.all([
+			getQueue(access_token),
+			getRecentTracks(access_token),
+		]);
+
 		return {
 			isPlaying: data.is_playing,
 			title: data.item.name,
@@ -122,6 +204,9 @@ export async function getNowPlaying(): Promise<NowPlayingData | null> {
 			songUrl: data.item.external_urls.spotify,
 			progress: data.progress_ms,
 			duration: data.item.duration_ms,
+			trackId: data.item.id,
+			previousTrack: recentData?.previousTrack,
+			upNext: queueData?.upNext,
 		};
 	} catch (error) {
 		console.error("Error fetching now playing:", error);
@@ -144,12 +229,14 @@ async function getRecentlyPlayed(
 		}
 
 		const data: RecentlyPlayedResponse = await response.json();
+		const tracks = data.items;
 
-		if (data.items.length === 0) {
+		if (!tracks || tracks.length === 0) {
 			return null;
 		}
 
-		const track = data.items[0].track;
+		const track = tracks[0].track;
+
 
 		return {
 			isPlaying: false,
@@ -158,7 +245,9 @@ async function getRecentlyPlayed(
 			album: track.album.name,
 			albumImageUrl: track.album.images[0]?.url ?? "",
 			songUrl: track.external_urls.spotify,
-			playedAt: data.items[0].played_at,
+			playedAt: tracks[0].played_at,
+			trackId: track.id,
+			previousTrack: tracks[1] ? trackToInfo(tracks[1].track) : undefined,
 		};
 	} catch (error) {
 		console.error("Error fetching recently played:", error);

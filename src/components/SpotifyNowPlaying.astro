@@ -2,17 +2,35 @@
 import { getNowPlaying, type NowPlayingData } from "../lib/spotify";
 
 const initialData = await getNowPlaying();
+console.log("Spotify Now Playing Initial Data:", initialData);
 ---
 
 <div
   id="spotify-now-playing"
-  class="bg-card border-border flex items-center gap-4 rounded-lg border p-4"
+  class="bg-card border-border relative flex h-full flex-col gap-3 overflow-hidden rounded-lg border p-4"
   data-initial={JSON.stringify(initialData)}
+  style={initialData?.albumImageUrl ? `--album-color: var(--primary)` : ""}
 >
-  <div id="spotify-content" class="w-full min-w-0">
+  <!-- Album color gradient overlay -->
+  <div
+    id="spotify-gradient"
+    class="pointer-events-none absolute inset-0 opacity-10"
+    style="background: radial-gradient(ellipse at top left, var(--album-color, transparent) 0%, transparent 70%)"
+  >
+  </div>
+
+  <div class="relative z-10">
+    <h3
+      class="text-muted-foreground text-xs font-medium tracking-wider uppercase flex items-center gap-2"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-music"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M9 17v-13h10v13" /><path d="M9 8h10" /></svg>
+       BEEP BOOP
+    </h3>
+  </div>
+  <div id="spotify-content" class="relative z-10 w-full min-w-0">
     {
       initialData ? (
-        <div class="flex items-center gap-4">
+        <div class="flex gap-4">
           <a
             id="spotify-album-link"
             href={initialData.songUrl}
@@ -27,10 +45,24 @@ const initialData = await getNowPlaying();
               width={96}
               height={96}
               class="rounded-md"
+              crossorigin="anonymous"
             />
+            <!-- Animated equalizer overlay when playing -->
+            {initialData.isPlaying && (
+              <div
+                id="spotify-equalizer"
+                class="absolute inset-0 flex items-end justify-center gap-0.5 rounded-md bg-black/40 p-2"
+              >
+                <span class="equalizer-bar bg-primary h-3 w-1 rounded-full" />
+                <span class="equalizer-bar bg-primary h-5 w-1 rounded-full" />
+                <span class="equalizer-bar bg-primary h-4 w-1 rounded-full" />
+                <span class="equalizer-bar bg-primary h-6 w-1 rounded-full" />
+                <span class="equalizer-bar bg-primary h-3 w-1 rounded-full" />
+              </div>
+            )}
           </a>
 
-          <div class="w-full flex-1">
+          <div class="flex w-full min-w-0 flex-1 flex-col">
             <div class="text-muted-foreground mb-1 flex items-center gap-2 text-xs">
               <svg
                 class="h-4 w-4 text-green-500"
@@ -41,38 +73,24 @@ const initialData = await getNowPlaying();
               </svg>
               <span id="spotify-status">
                 {initialData.isPlaying ? (
-                  <span class="flex items-center gap-1">
-                    Now Playing
-                    <span class="flex gap-0.5">
-                      <span
-                        class="bg-primary h-2 w-0.5 animate-pulse"
-                        style="animation-delay: 0ms"
-                      />
-                      <span
-                        class="bg-primary h-2 w-0.5 animate-pulse"
-                        style="animation-delay: 150ms"
-                      />
-                      <span
-                        class="bg-primary h-2 w-0.5 animate-pulse"
-                        style="animation-delay: 300ms"
-                      />
-                    </span>
-                  </span>
+                  <span class="flex items-center gap-1">Now Playing</span>
                 ) : (
                   <span>Last Played</span>
                 )}
               </span>
             </div>
 
-            <a
-              id="spotify-title"
-              href={initialData.songUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hover:text-primary text-foreground block truncate font-medium transition-colors"
-            >
-              {initialData.title}
-            </a>
+            <div id="spotify-title-container" class="marquee-container overflow-hidden">
+              <a
+                id="spotify-title"
+                href={initialData.songUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-primary text-foreground marquee-content inline-block whitespace-nowrap font-medium transition-colors"
+              >
+                {initialData.title}
+              </a>
+            </div>
 
             <p
               id="spotify-artist"
@@ -114,6 +132,67 @@ const initialData = await getNowPlaying();
             </div>
           </div>
         </div>
+
+        <!-- Previous & Up Next -->
+        <div class="border-border mt-4 flex flex-col gap-2 border-t pt-3">
+          {/* Previous Track */}
+          <div id="spotify-previous" class={`flex items-center gap-3 ${initialData.previousTrack ? '' : 'hidden'}`}>
+            <span class="text-muted-foreground w-16 shrink-0 text-xs">Previous</span>
+            <a
+              id="spotify-previous-link"
+              href={initialData.previousTrack?.songUrl ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex min-w-0 flex-1 items-center gap-2"
+            >
+              <img
+                id="spotify-previous-img"
+                src={initialData.previousTrack?.albumImageUrl ?? ""}
+                alt=""
+                class="h-8 w-8 shrink-0 rounded"
+                width={32}
+                height={32}
+              />
+              <div class="min-w-0 flex-1">
+                <p id="spotify-previous-title" class="text-foreground truncate text-sm font-medium">
+                  {initialData.previousTrack?.title ?? ""}
+                </p>
+                <p id="spotify-previous-artist" class="text-muted-foreground truncate text-xs">
+                  {initialData.previousTrack?.artist ?? ""}
+                </p>
+              </div>
+            </a>
+          </div>
+
+          {/* Up Next */}
+          <div id="spotify-upnext" class={`flex items-center gap-3 ${initialData.upNext ? '' : 'hidden'}`}>
+            <span class="text-muted-foreground w-16 shrink-0 text-xs">Up Next</span>
+            <a
+              id="spotify-upnext-link"
+              href={initialData.upNext?.songUrl ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex min-w-0 flex-1 items-center gap-2"
+            >
+              <img
+                id="spotify-upnext-img"
+                src={initialData.upNext?.albumImageUrl ?? ""}
+                alt=""
+                class="h-8 w-8 shrink-0 rounded"
+                width={32}
+                height={32}
+              />
+              <div class="min-w-0 flex-1">
+                <p id="spotify-upnext-title" class="text-foreground truncate text-sm font-medium">
+                  {initialData.upNext?.title ?? ""}
+                </p>
+                <p id="spotify-upnext-artist" class="text-muted-foreground truncate text-xs">
+                  {initialData.upNext?.artist ?? ""}
+                </p>
+              </div>
+            </a>
+          </div>
+        </div>
       ) : (
         <div class="text-muted-foreground flex items-center gap-3">
           <svg class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
@@ -126,7 +205,77 @@ const initialData = await getNowPlaying();
   </div>
 </div>
 
+<style>
+  @keyframes equalize {
+    0%,
+    100% {
+      height: 0.5rem;
+    }
+    50% {
+      height: 1.5rem;
+    }
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .equalizer-bar {
+    animation: equalize 0.8s ease-in-out infinite;
+  }
+
+  .equalizer-bar:nth-child(1) {
+    animation-delay: 0s;
+  }
+  .equalizer-bar:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+  .equalizer-bar:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+  .equalizer-bar:nth-child(4) {
+    animation-delay: 0.45s;
+  }
+  .equalizer-bar:nth-child(5) {
+    animation-delay: 0.6s;
+  }
+
+  .marquee-container {
+    position: relative;
+  }
+
+  .marquee-content.scrolling {
+    animation: marquee 10s linear infinite;
+  }
+
+  .marquee-content.scrolling::after {
+    content: attr(data-text);
+    padding-left: 3rem;
+  }
+</style>
+
 <script>
+  interface TrackInfo {
+    title: string;
+    artist: string;
+    album: string;
+    albumImageUrl: string;
+    songUrl: string;
+  }
+
+  interface AudioFeatures {
+    energy: number;
+    tempo: number;
+    danceability: number;
+    valence: number;
+    mood: string;
+  }
+
   interface NowPlayingData {
     isPlaying: boolean;
     title: string;
@@ -137,14 +286,17 @@ const initialData = await getNowPlaying();
     progress?: number;
     duration?: number;
     playedAt?: string;
+    trackId?: string;
+    audioFeatures?: AudioFeatures;
+    previousTrack?: TrackInfo;
+    upNext?: TrackInfo;
   }
 
-  const POLL_INTERVAL = 10000; // Poll API every 10 seconds
-  const PROGRESS_UPDATE_INTERVAL = 1000; // Update progress every second
+  const POLL_INTERVAL = 10000;
+  const PROGRESS_UPDATE_INTERVAL = 1000;
 
   let currentData: NowPlayingData | null = null;
   let localProgress = 0;
-  let lastFetchTime = 0;
   let progressInterval: ReturnType<typeof setInterval> | null = null;
 
   function formatTime(ms: number): string {
@@ -152,6 +304,58 @@ const initialData = await getNowPlaying();
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
+  }
+
+  // Extract dominant color from album art
+  function extractColor(img: HTMLImageElement): string {
+    try {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return "hsl(var(--primary))";
+
+      canvas.width = 50;
+      canvas.height = 50;
+      ctx.drawImage(img, 0, 0, 50, 50);
+
+      const imageData = ctx.getImageData(0, 0, 50, 50).data;
+      let r = 0,
+        g = 0,
+        b = 0,
+        count = 0;
+
+      for (let i = 0; i < imageData.length; i += 16) {
+        // Sample every 4th pixel
+        const pr = imageData[i];
+        const pg = imageData[i + 1];
+        const pb = imageData[i + 2];
+        // Skip very dark or very light pixels
+        if (pr + pg + pb > 60 && pr + pg + pb < 700) {
+          r += pr;
+          g += pg;
+          b += pb;
+          count++;
+        }
+      }
+
+      if (count === 0) return "hsl(var(--primary))";
+
+      r = Math.round(r / count);
+      g = Math.round(g / count);
+      b = Math.round(b / count);
+
+      return `rgb(${r}, ${g}, ${b})`;
+    } catch {
+      return "hsl(var(--primary))";
+    }
+  }
+
+  function updateAlbumColor(img: HTMLImageElement) {
+    const container = document.getElementById("spotify-now-playing");
+    const gradient = document.getElementById("spotify-gradient");
+    if (!container || !gradient) return;
+
+    const color = extractColor(img);
+    container.style.setProperty("--album-color", color);
   }
 
   function updateProgressUI() {
@@ -188,6 +392,43 @@ const initialData = await getNowPlaying();
     }, PROGRESS_UPDATE_INTERVAL);
   }
 
+  // Check if title needs scrolling
+  function checkTitleScroll() {
+    const container = document.getElementById("spotify-title-container");
+    const title = document.getElementById("spotify-title") as HTMLAnchorElement | null;
+    
+    if (container && title) {
+      const needsScroll = title.scrollWidth > container.clientWidth;
+      
+      if (needsScroll) {
+        title.classList.add("scrolling");
+        title.dataset.text = title.textContent || "";
+      } else {
+        title.classList.remove("scrolling");
+      }
+    }
+  }
+
+  // Update a track row (previous/upnext)
+  function updateTrackRow(prefix: string, track?: TrackInfo) {
+    const container = document.getElementById(prefix);
+    const link = document.getElementById(`${prefix}-link`) as HTMLAnchorElement | null;
+    const img = document.getElementById(`${prefix}-img`) as HTMLImageElement | null;
+    const title = document.getElementById(`${prefix}-title`);
+    const artist = document.getElementById(`${prefix}-artist`);
+
+    if (container) {
+      container.classList.toggle("hidden", !track);
+    }
+
+    if (track) {
+      if (link) link.href = track.songUrl;
+      if (img) img.src = track.albumImageUrl;
+      if (title) title.textContent = track.title;
+      if (artist) artist.textContent = track.artist;
+    }
+  }
+
   function updateUI(data: NowPlayingData | null) {
     const albumLink = document.getElementById(
       "spotify-album-link",
@@ -195,7 +436,7 @@ const initialData = await getNowPlaying();
     const albumImg = document.getElementById(
       "spotify-album-img",
     ) as HTMLImageElement | null;
-    const playingBadge = document.getElementById("spotify-playing-badge");
+    const equalizer = document.getElementById("spotify-equalizer");
     const statusEl = document.getElementById("spotify-status");
     const titleEl = document.getElementById(
       "spotify-title",
@@ -205,10 +446,11 @@ const initialData = await getNowPlaying();
       "spotify-progress-container",
     );
     const durationEl = document.getElementById("spotify-duration");
+    const moodEl = document.getElementById("spotify-mood");
+    const tempoEl = document.getElementById("spotify-tempo");
 
     if (!data) return;
 
-    // Update track info if song changed
     const songChanged =
       !currentData ||
       currentData.title !== data.title ||
@@ -219,33 +461,41 @@ const initialData = await getNowPlaying();
       if (albumImg) {
         albumImg.src = data.albumImageUrl;
         albumImg.alt = `${data.album} album cover`;
+        albumImg.onload = () => updateAlbumColor(albumImg);
       }
       if (titleEl) {
         titleEl.href = data.songUrl;
         titleEl.textContent = data.title;
+        titleEl.dataset.text = data.title;
+        // Check scroll after DOM update
+        setTimeout(checkTitleScroll, 0);
       }
       if (artistEl) artistEl.textContent = data.artist;
       if (durationEl && data.duration)
         durationEl.textContent = formatTime(data.duration);
+
+      // Update audio features
+      if (data.audioFeatures) {
+        if (moodEl) moodEl.textContent = data.audioFeatures.mood;
+        if (tempoEl)
+          tempoEl.textContent = `${Math.round(data.audioFeatures.tempo)} BPM`;
+      }
+
+      // Update previous track
+      updateTrackRow("spotify-previous", data.previousTrack);
+      
+      // Update up next track
+      updateTrackRow("spotify-upnext", data.upNext);
     }
 
-    // Update playing status
-    if (playingBadge) {
-      playingBadge.classList.toggle("hidden", !data.isPlaying);
+    // Update equalizer visibility
+    if (equalizer) {
+      equalizer.classList.toggle("hidden", !data.isPlaying);
     }
 
     if (statusEl) {
       if (data.isPlaying) {
-        statusEl.innerHTML = `
-          <span class="flex items-center gap-1">
-            Now Playing
-            <span class="flex gap-0.5">
-              <span class="bg-primary h-2 w-0.5 animate-pulse" style="animation-delay: 0ms"></span>
-              <span class="bg-primary h-2 w-0.5 animate-pulse" style="animation-delay: 150ms"></span>
-              <span class="bg-primary h-2 w-0.5 animate-pulse" style="animation-delay: 300ms"></span>
-            </span>
-          </span>
-        `;
+        statusEl.innerHTML = `<span class="flex items-center gap-1">Now Playing</span>`;
       } else {
         statusEl.innerHTML = "<span>Last Played</span>";
       }
@@ -255,7 +505,6 @@ const initialData = await getNowPlaying();
       progressContainer.classList.toggle("hidden", !data.isPlaying);
     }
 
-    // Update progress from server
     if (data.progress !== undefined) {
       localProgress = data.progress;
     }
@@ -268,15 +517,18 @@ const initialData = await getNowPlaying();
     try {
       const response = await fetch("/api/spotify/now-playing");
       const data: NowPlayingData | null = await response.json();
-      lastFetchTime = Date.now();
       updateUI(data);
     } catch (error) {
       console.error("Failed to fetch now playing:", error);
     }
   }
 
+  // Initialize
   const container = document.getElementById("spotify-now-playing");
   const initialDataStr = container?.dataset.initial;
+  const albumImg = document.getElementById(
+    "spotify-album-img",
+  ) as HTMLImageElement | null;
 
   if (initialDataStr) {
     try {
@@ -285,14 +537,22 @@ const initialData = await getNowPlaying();
         localProgress = currentData.progress;
       }
       updateProgressUI();
+
+      // Extract color on load
+      if (albumImg && albumImg.complete) {
+        updateAlbumColor(albumImg);
+      } else if (albumImg) {
+        albumImg.onload = () => updateAlbumColor(albumImg);
+      }
     } catch (error) {
       console.error("Failed to parse initial data:", error);
     }
   }
 
-  // Start progress animation
-  startProgressAnimation();
+  // Initial check and recheck on window resize
+  checkTitleScroll();
+  window.addEventListener("resize", checkTitleScroll);
 
-  // Poll for updates
+  startProgressAnimation();
   setInterval(fetchNowPlaying, POLL_INTERVAL);
 </script>
