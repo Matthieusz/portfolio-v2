@@ -2,6 +2,7 @@
 import LocationMap from "@/components/LocationMap.astro";
 import SpotifyNowPlaying from "@/components/SpotifyNowPlaying.astro";
 import Separator from "@/components/starwind/separator";
+import TicTacToe from "@/components/TicTacToe.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
 
 export const prerender = false;
@@ -112,10 +113,8 @@ export const prerender = false;
           <div class="md:col-span-2">
             <LocationMap />
           </div>
-          <div
-            class="bg-card border-border flex items-center justify-center rounded-lg border p-4"
-          >
-            <span class="text-muted-foreground">Placeholder 3</span>
+          <div>
+            <TicTacToe />
           </div>
         </div>
       </section>
