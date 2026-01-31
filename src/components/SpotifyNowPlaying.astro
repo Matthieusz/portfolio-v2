@@ -1,0 +1,298 @@
+---
+import { getNowPlaying, type NowPlayingData } from "../lib/spotify";
+
+const initialData = await getNowPlaying();
+---
+
+<div
+  id="spotify-now-playing"
+  class="bg-card border-border flex items-center gap-4 rounded-lg border p-4"
+  data-initial={JSON.stringify(initialData)}
+>
+  <div id="spotify-content" class="w-full min-w-0">
+    {
+      initialData ? (
+        <div class="flex items-center gap-4">
+          <a
+            id="spotify-album-link"
+            href={initialData.songUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="relative shrink-0"
+          >
+            <img
+              id="spotify-album-img"
+              src={initialData.albumImageUrl}
+              alt={`${initialData.album} album cover`}
+              width={96}
+              height={96}
+              class="rounded-md"
+            />
+          </a>
+
+          <div class="w-full flex-1">
+            <div class="text-muted-foreground mb-1 flex items-center gap-2 text-xs">
+              <svg
+                class="h-4 w-4 text-green-500"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+              </svg>
+              <span id="spotify-status">
+                {initialData.isPlaying ? (
+                  <span class="flex items-center gap-1">
+                    Now Playing
+                    <span class="flex gap-0.5">
+                      <span
+                        class="bg-primary h-2 w-0.5 animate-pulse"
+                        style="animation-delay: 0ms"
+                      />
+                      <span
+                        class="bg-primary h-2 w-0.5 animate-pulse"
+                        style="animation-delay: 150ms"
+                      />
+                      <span
+                        class="bg-primary h-2 w-0.5 animate-pulse"
+                        style="animation-delay: 300ms"
+                      />
+                    </span>
+                  </span>
+                ) : (
+                  <span>Last Played</span>
+                )}
+              </span>
+            </div>
+
+            <a
+              id="spotify-title"
+              href={initialData.songUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-primary text-foreground block truncate font-medium transition-colors"
+            >
+              {initialData.title}
+            </a>
+
+            <p
+              id="spotify-artist"
+              class="text-muted-foreground truncate text-sm"
+            >
+              {initialData.artist}
+            </p>
+
+            <div
+              id="spotify-progress-container"
+              class:list={[
+                "mt-2 flex items-center gap-2 text-xs",
+                { hidden: !initialData.isPlaying },
+              ]}
+            >
+              <span
+                id="spotify-current-time"
+                class="text-muted-foreground tabular-nums"
+              >
+                {initialData.progress
+                  ? `${Math.floor(initialData.progress / 60000)}:${String(Math.floor((initialData.progress % 60000) / 1000)).padStart(2, "0")}`
+                  : "0:00"}
+              </span>
+              <div class="bg-muted h-1 flex-1 overflow-hidden rounded-full">
+                <div
+                  id="spotify-progress-bar"
+                  class="bg-primary linear h-full rounded-full transition-[width] duration-1000"
+                  style={`width: ${initialData.progress && initialData.duration ? (initialData.progress / initialData.duration) * 100 : 0}%`}
+                />
+              </div>
+              <span
+                id="spotify-duration"
+                class="text-muted-foreground tabular-nums"
+              >
+                {initialData.duration
+                  ? `${Math.floor(initialData.duration / 60000)}:${String(Math.floor((initialData.duration % 60000) / 1000)).padStart(2, "0")}`
+                  : "0:00"}
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div class="text-muted-foreground flex items-center gap-3">
+          <svg class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" />
+          </svg>
+          <span>Not playing anything</span>
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<script>
+  interface NowPlayingData {
+    isPlaying: boolean;
+    title: string;
+    artist: string;
+    album: string;
+    albumImageUrl: string;
+    songUrl: string;
+    progress?: number;
+    duration?: number;
+    playedAt?: string;
+  }
+
+  const POLL_INTERVAL = 10000; // Poll API every 10 seconds
+  const PROGRESS_UPDATE_INTERVAL = 1000; // Update progress every second
+
+  let currentData: NowPlayingData | null = null;
+  let localProgress = 0;
+  let lastFetchTime = 0;
+  let progressInterval: ReturnType<typeof setInterval> | null = null;
+
+  function formatTime(ms: number): string {
+    const seconds = Math.floor(ms / 1000);
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  }
+
+  function updateProgressUI() {
+    const progressBar = document.getElementById("spotify-progress-bar");
+    const currentTimeEl = document.getElementById("spotify-current-time");
+
+    if (
+      !currentData?.isPlaying ||
+      !currentData.duration ||
+      !progressBar ||
+      !currentTimeEl
+    ) {
+      return;
+    }
+
+    const percentage = Math.min(
+      (localProgress / currentData.duration) * 100,
+      100,
+    );
+    progressBar.style.width = `${percentage}%`;
+    currentTimeEl.textContent = formatTime(localProgress);
+  }
+
+  function startProgressAnimation() {
+    if (progressInterval) {
+      clearInterval(progressInterval);
+    }
+
+    progressInterval = setInterval(() => {
+      if (currentData?.isPlaying && currentData.duration) {
+        localProgress = Math.min(localProgress + 1000, currentData.duration);
+        updateProgressUI();
+      }
+    }, PROGRESS_UPDATE_INTERVAL);
+  }
+
+  function updateUI(data: NowPlayingData | null) {
+    const albumLink = document.getElementById(
+      "spotify-album-link",
+    ) as HTMLAnchorElement | null;
+    const albumImg = document.getElementById(
+      "spotify-album-img",
+    ) as HTMLImageElement | null;
+    const playingBadge = document.getElementById("spotify-playing-badge");
+    const statusEl = document.getElementById("spotify-status");
+    const titleEl = document.getElementById(
+      "spotify-title",
+    ) as HTMLAnchorElement | null;
+    const artistEl = document.getElementById("spotify-artist");
+    const progressContainer = document.getElementById(
+      "spotify-progress-container",
+    );
+    const durationEl = document.getElementById("spotify-duration");
+
+    if (!data) return;
+
+    // Update track info if song changed
+    const songChanged =
+      !currentData ||
+      currentData.title !== data.title ||
+      currentData.artist !== data.artist;
+
+    if (songChanged) {
+      if (albumLink) albumLink.href = data.songUrl;
+      if (albumImg) {
+        albumImg.src = data.albumImageUrl;
+        albumImg.alt = `${data.album} album cover`;
+      }
+      if (titleEl) {
+        titleEl.href = data.songUrl;
+        titleEl.textContent = data.title;
+      }
+      if (artistEl) artistEl.textContent = data.artist;
+      if (durationEl && data.duration)
+        durationEl.textContent = formatTime(data.duration);
+    }
+
+    // Update playing status
+    if (playingBadge) {
+      playingBadge.classList.toggle("hidden", !data.isPlaying);
+    }
+
+    if (statusEl) {
+      if (data.isPlaying) {
+        statusEl.innerHTML = `
+          <span class="flex items-center gap-1">
+            Now Playing
+            <span class="flex gap-0.5">
+              <span class="bg-primary h-2 w-0.5 animate-pulse" style="animation-delay: 0ms"></span>
+              <span class="bg-primary h-2 w-0.5 animate-pulse" style="animation-delay: 150ms"></span>
+              <span class="bg-primary h-2 w-0.5 animate-pulse" style="animation-delay: 300ms"></span>
+            </span>
+          </span>
+        `;
+      } else {
+        statusEl.innerHTML = "<span>Last Played</span>";
+      }
+    }
+
+    if (progressContainer) {
+      progressContainer.classList.toggle("hidden", !data.isPlaying);
+    }
+
+    // Update progress from server
+    if (data.progress !== undefined) {
+      localProgress = data.progress;
+    }
+
+    currentData = data;
+    updateProgressUI();
+  }
+
+  async function fetchNowPlaying() {
+    try {
+      const response = await fetch("/api/spotify/now-playing");
+      const data: NowPlayingData | null = await response.json();
+      lastFetchTime = Date.now();
+      updateUI(data);
+    } catch (error) {
+      console.error("Failed to fetch now playing:", error);
+    }
+  }
+
+  const container = document.getElementById("spotify-now-playing");
+  const initialDataStr = container?.dataset.initial;
+
+  if (initialDataStr) {
+    try {
+      currentData = JSON.parse(initialDataStr);
+      if (currentData?.progress) {
+        localProgress = currentData.progress;
+      }
+      updateProgressUI();
+    } catch (error) {
+      console.error("Failed to parse initial data:", error);
+    }
+  }
+
+  // Start progress animation
+  startProgressAnimation();
+
+  // Poll for updates
+  setInterval(fetchNowPlaying, POLL_INTERVAL);
+</script>
