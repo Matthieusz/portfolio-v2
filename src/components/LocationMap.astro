@@ -1,0 +1,126 @@
+---
+interface Props {
+  lat?: number;
+  lng?: number;
+  zoom?: number;
+  label?: string;
+}
+
+const {
+  lat = 52.4064,
+  lng = 16.9152,
+  zoom = 12,
+  label = "Poznań, Poland",
+} = Astro.props;
+---
+
+<div
+  id="location-map"
+  class="bg-card border-border relative flex h-full min-h-60 w-full flex-col overflow-hidden rounded-lg border p-1"
+  data-lat={lat}
+  data-lng={lng}
+  data-zoom={zoom}
+  data-label={label}
+>
+  <h3
+    class="text-muted-foreground mb-3 flex items-center gap-2 px-2 pt-2 text-xs font-medium tracking-wider uppercase"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="var(--primary)"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="icon icon-tabler icons-tabler-outline icon-tabler-map-pin"
+      ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
+        d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path><path
+        d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0"
+      ></path></svg
+    >
+    Currently based in
+  </h3>
+  <div id="map" class="h-full w-full flex-1 rounded-md"></div>
+  <div class="pointer-events-none absolute bottom-2 left-2 z-1000">
+    <div
+      class="bg-card/80 text-foreground flex items-center gap-2 rounded-md px-2 py-1 text-xs backdrop-blur-sm"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="text-primary"
+      >
+        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </svg>
+      <span>{label}</span>
+    </div>
+  </div>
+</div>
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+/>
+<script
+  is:inline
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""></script>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const container = document.getElementById("location-map");
+    const mapElement = document.getElementById("map");
+
+    if (container && mapElement && window.L) {
+      const lat = Number.parseFloat(container.dataset.lat || "52.4064");
+      const lng = Number.parseFloat(container.dataset.lng || "16.9252");
+      const zoom = Number.parseInt(container.dataset.zoom || "12", 10);
+
+      const map = L.map("map", {
+        zoomControl: false,
+        attributionControl: false,
+      }).setView([lat, lng], zoom);
+
+      // Dark theme tile layer
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        {
+          maxZoom: 19,
+        },
+      ).addTo(map);
+
+      // Custom marker
+      const markerIcon = L.divIcon({
+        className: "custom-marker",
+        html: `<div class="flex h-6 w-6 items-center justify-center rounded-full bg-primary shadow-lg">
+          <div class="h-2 w-2 rounded-full bg-white"></div>
+        </div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      });
+
+      L.marker([lat, lng], { icon: markerIcon }).addTo(map);
+    }
+  });
+</script>
+
+<style>
+  .custom-marker {
+    background: transparent;
+    border: none;
+  }
+</style>

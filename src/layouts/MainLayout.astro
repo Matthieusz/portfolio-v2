@@ -9,13 +9,19 @@ import Footer from "@/components/Footer.astro";
   class="dark selection:bg-primary/30 selection:text-primary/80 caret-accent scrollbar font-mono"
 >
   <head>
-    <meta charset="utf-8">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <meta name="viewport" content="width=device-width">
-    <meta name="generator" content={Astro.generator}>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
     <title>Mateusz Irski</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
   </head>
-  <body class="mx-auto max-w-[90%] md:max-w-[80%] flex flex-col min-h-screen ">
+  <body class="mx-auto flex min-h-screen max-w-[90%] flex-col md:max-w-[80%]">
     <Header />
     <slot />
     <Footer />
