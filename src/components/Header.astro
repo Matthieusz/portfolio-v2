@@ -2,92 +2,96 @@
 import Breadcrumb from "../components/Breadcrumb.astro";
 ---
 
-<div class="sticky top-0 flex h-20 items-center justify-between p-4 pb-8">
-  <Breadcrumb />
+<header id="site-header" class="sticky top-0 z-2000 backdrop-blur-md">
+  <div
+    class="mx-auto flex h-16 max-w-[90%] items-center justify-between p-4 md:h-20 md:max-w-[80%]"
+  >
+    <Breadcrumb />
 
-  <!-- Desktop nav -->
-  <nav class="hidden items-center gap-8 text-lg md:flex" aria-label="Primary">
-    <a
-      href="/"
-      class="hover:text-primary rounded px-3 py-2 font-medium transition-colors duration-250"
-    >
-      Home
-    </a>
-    <a
-      href="/about"
-      class="py-2hover:text-primary rounded px-3 font-medium transition-colors duration-250"
-    >
-      About
-    </a>
-    <a
-      href="/projects"
-      class="hover:text-primary rounded px-3 py-2 font-medium transition-colors duration-250"
-    >
-      Projects
-    </a>
-    <a
-      href="/blog"
-      class="hover:text-primary rounded px-3 py-2 font-medium transition-colors duration-250"
-    >
-      Blog
-    </a>
-  </nav>
-
-  <!-- Mobile hamburger menu -->
-  <details class="relative md:hidden">
-    <summary
-      class="hover:bg-primary/10 flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-md transition-colors select-none"
-      aria-label="Open menu"
-    >
-      <span class="sr-only">Open menu</span>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="h-5 w-5"
-        aria-hidden="true"
-      >
-        <line x1="4" y1="6" x2="20" y2="6"></line>
-        <line x1="4" y1="12" x2="20" y2="12"></line>
-        <line x1="4" y1="18" x2="20" y2="18"></line>
-      </svg>
-    </summary>
-
-    <nav
-      class="border-border bg-background absolute right-0 mt-3 w-44 rounded-md border p-2 shadow-lg"
-      aria-label="Mobile"
-    >
+    <!-- Desktop nav -->
+    <nav class="hidden items-center gap-8 text-lg md:flex" aria-label="Primary">
       <a
         href="/"
-        class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
+        class="hover:text-primary rounded px-3 py-2 font-medium transition-colors duration-250"
       >
         Home
       </a>
       <a
         href="/about"
-        class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
+        class="hover:text-primary rounded px-3 py-2 font-medium transition-colors duration-250"
       >
         About
       </a>
       <a
         href="/projects"
-        class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
+        class="hover:text-primary rounded px-3 py-2 font-medium transition-colors duration-250"
       >
         Projects
       </a>
       <a
         href="/blog"
-        class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
+        class="hover:text-primary rounded px-3 py-2 font-medium transition-colors duration-250"
       >
         Blog
       </a>
     </nav>
-  </details>
-</div>
+
+    <!-- Mobile hamburger menu -->
+    <details class="relative md:hidden">
+      <summary
+        class="hover:bg-primary/10 flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-md transition-colors select-none"
+        aria-label="Open menu"
+      >
+        <span class="sr-only">Open menu</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="h-5 w-5"
+          aria-hidden="true"
+        >
+          <line x1="4" y1="6" x2="20" y2="6"></line>
+          <line x1="4" y1="12" x2="20" y2="12"></line>
+          <line x1="4" y1="18" x2="20" y2="18"></line>
+        </svg>
+      </summary>
+
+      <nav
+        class="border-border bg-background absolute right-0 mt-3 w-44 rounded-md border p-2 shadow-lg"
+        aria-label="Mobile"
+      >
+        <a
+          href="/"
+          class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
+        >
+          Home
+        </a>
+        <a
+          href="/about"
+          class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
+        >
+          About
+        </a>
+        <a
+          href="/projects"
+          class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
+        >
+          Projects
+        </a>
+        <a
+          href="/blog"
+          class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
+        >
+          Blog
+        </a>
+      </nav>
+    </details>
+  </div>
+</header>
 
 <style>
   summary::-webkit-details-marker {

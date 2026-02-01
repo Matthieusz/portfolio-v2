@@ -1,7 +1,7 @@
 ---
+import Footer from "@/components/Footer.astro";
 import Header from "@/components/Header.astro";
 import "../styles/global.css";
-import Footer from "@/components/Footer.astro";
 ---
 
 <html
@@ -21,9 +21,11 @@ import Footer from "@/components/Footer.astro";
       crossorigin=""
     />
   </head>
-  <body class="mx-auto flex min-h-screen max-w-[90%] flex-col md:max-w-[80%]">
+  <body class="min-h-screen">
     <Header />
-    <slot />
-    <Footer />
+    <div class="mx-auto flex min-h-screen max-w-[90%] flex-col md:max-w-[80%]">
+      <slot />
+      <Footer />
+    </div>
   </body>
 </html>
