@@ -1,5 +1,5 @@
 ---
-import { getNowPlaying, type NowPlayingData } from "../lib/spotify";
+import { getNowPlaying } from "../lib/spotify";
 
 const initialData = await getNowPlaying();
 ---
@@ -259,13 +259,6 @@ const initialData = await getNowPlaying();
     songUrl: string;
   }
 
-  interface AudioFeatures {
-    energy: number;
-    tempo: number;
-    danceability: number;
-    valence: number;
-    mood: string;
-  }
 
   interface NowPlayingData {
     isPlaying: boolean;
@@ -278,7 +271,6 @@ const initialData = await getNowPlaying();
     duration?: number;
     playedAt?: string;
     trackId?: string;
-    audioFeatures?: AudioFeatures;
     previousTrack?: TrackInfo;
     upNext?: TrackInfo;
   }
@@ -464,13 +456,6 @@ const initialData = await getNowPlaying();
       if (artistEl) artistEl.textContent = data.artist;
       if (durationEl && data.duration)
         durationEl.textContent = formatTime(data.duration);
-
-      // Update audio features
-      if (data.audioFeatures) {
-        if (moodEl) moodEl.textContent = data.audioFeatures.mood;
-        if (tempoEl)
-          tempoEl.textContent = `${Math.round(data.audioFeatures.tempo)} BPM`;
-      }
 
       // Update previous track
       updateTrackRow("spotify-previous", data.previousTrack);

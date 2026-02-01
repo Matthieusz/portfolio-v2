@@ -1,6 +1,7 @@
 // Run this script with: bun scripts/get-spotify-token.ts
 // Follow the instructions to get a valid refresh token
 
+export {};
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const REDIRECT_URI = "http://127.0.0.1:3000/callback";
