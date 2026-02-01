@@ -7,9 +7,7 @@
     "build": "astro build",
     "start": "node ./dist/server/entry.mjs",
     "preview": "astro preview",
-    "astro": "astro",
-    "check": "ultracite check .",
-    "fix": "ultracite fix ."
+    "astro": "astro"
   },
   "dependencies": {
     "@astrojs/node": "^9.5.1",
@@ -26,11 +24,8 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^25.1.0",
-    "eslint": "^9.39.2",
     "prettier": "^3.8.1",
     "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.7.2",
-    "stylelint": "^17.1.0",
-    "ultracite": "7.0.11"
+    "prettier-plugin-tailwindcss": "^0.7.2"
   }
 }
