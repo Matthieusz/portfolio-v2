@@ -2,7 +2,7 @@
 import LocationMap from "@/components/LocationMap.astro";
 import SpotifyNowPlaying from "@/components/SpotifyNowPlaying.astro";
 import Separator from "@/components/starwind/separator";
-import TicTacToe from "@/components/TicTacToe.astro";
+import TicTacToe from "@/components/TicTacToe.tsx";
 import MainLayout from "@/layouts/MainLayout.astro";
 
 export const prerender = false;
@@ -106,7 +106,7 @@ export const prerender = false;
             <LocationMap />
           </div>
           <div>
-            <TicTacToe />
+            <TicTacToe client:idle />
           </div>
         </div>
       </section>

@@ -12,11 +12,13 @@
   "dependencies": {
     "@astrojs/check": "^0.9.6",
     "@astrojs/node": "^9.5.1",
+    "@astrojs/solid-js": "^5.1.3",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@tabler/icons": "^3",
     "@tailwindcss/forms": "^0.5",
     "@tailwindcss/vite": "^4",
     "astro": "^5.16.9",
+    "solid-js": "^1.9.11",
     "tailwind-merge": "^3",
     "tailwind-variants": "^3",
     "tailwindcss": "^4",
