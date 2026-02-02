@@ -25,7 +25,7 @@ const ASCII_ART: Record<TimeOfDay, string> = {
          ~~       ~~~~;         ~~  ~~  ~~           ;~~~~             
            ~~~;        ~~~~;                   ;~~~~       ;~~~         
      ~~        ~~~~;       ~~~ @@@@@@@@@@@@ ~~~       ;~~~~    ~~      
-  ^^     ~~~        ~~~;     @@@@@@@@@@@@@@@@     ;~~~     ~~~         
+         ~~~        ~~~;     @@@@@@@@@@@@@@@@     ;~~~     ~~~         
                ~~~      ~~~ @@@@@@@@@@@@@@@@@@ ~~~    ~~~         ^^   
             ^^             @@@@@@@@@@@@@@@@@@@@                        
 ______________ ____________&&&&&&&&&&&&&&&&&&&&___________ ____________
@@ -147,9 +147,24 @@ const CurrentTimeASCII: Component = () => {
           <button
             type="button"
             onClick={cyclePeriod}
-            class="border-border bg-background text-foreground hover:bg-muted rounded border px-2 py-1 text-xs transition-colors"
+            class="border-border bg-background text-foreground hover:bg-muted flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors"
             title="Cycle through times of day"
           >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="icon icon-tabler icons-tabler-outline icon-tabler-rotate"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M19.95 11a8 8 0 1 0 -.5 4m.5 5v-5h-5" />
+            </svg>
             {currentPeriod()}
           </button>
           {isManual() && (
