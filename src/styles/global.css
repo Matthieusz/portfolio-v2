@@ -10,6 +10,7 @@
 @theme {
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-rotate: spin 3s linear infinite;
 
   @keyframes accordion-down {
     from {
