@@ -81,29 +81,39 @@ const {
   crossorigin=""></script>
 
 <script is:inline>
-  document.addEventListener("DOMContentLoaded", () => {
+  const initLocationMap = () => {
     const container = document.getElementById("location-map");
     const mapElement = document.getElementById("map");
 
-    if (container && mapElement && window.L) {
-      const lat = Number.parseFloat(container.dataset.lat || "52.4064");
-      const lng = Number.parseFloat(container.dataset.lng || "16.9252");
-      const zoom = Number.parseInt(container.dataset.zoom || "12", 10);
-
-      const map = L.map("map", {
-        zoomControl: false,
-        attributionControl: false,
-      }).setView([lat, lng], zoom);
-
-      // Dark theme tile layer
-      L.tileLayer(
-        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-        {
-          maxZoom: 19,
-        },
-      ).addTo(map);
+    if (!container || !mapElement || !window.L) {
+      return;
     }
-  });
+
+    if (mapElement._leaflet_id) {
+      mapElement._leaflet_id = undefined;
+      mapElement.innerHTML = "";
+    }
+
+    const lat = Number.parseFloat(container.dataset.lat || "52.4064");
+    const lng = Number.parseFloat(container.dataset.lng || "16.9252");
+    const zoom = Number.parseInt(container.dataset.zoom || "12", 10);
+
+    const map = L.map("map", {
+      zoomControl: false,
+      attributionControl: false,
+    }).setView([lat, lng], zoom);
+
+    // Dark theme tile layer
+    L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      {
+        maxZoom: 19,
+      },
+    ).addTo(map);
+  };
+
+  document.addEventListener("DOMContentLoaded", initLocationMap);
+  document.addEventListener("astro:page-load", initLocationMap);
 </script>
 
 <style>
