@@ -1,28 +1,90 @@
 ---
 import MainLayout from "@/layouts/MainLayout.astro";
 import { getCollection } from "astro:content";
-const projects = await getCollection("projects");
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
 ---
 
 <MainLayout>
   <h1 class="mb-6 text-3xl font-bold">Projects</h1>
-  <p>
+  <p class="text-muted-foreground">
     Here are some of the projects I've worked on. Feel free to explore and reach
     out if you'd like to collaborate!
   </p>
-  <ul>
+
+  <div class="mt-6 grid gap-4 md:grid-cols-3">
     {
       projects.map((project) => (
-        <li class="mb-4">
-          <a
-            href={`/projects/${project.slug}`}
-            class="text-primary text-xl font-semibold hover:underline"
-          >
-            {project.data.title}
+        <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
+          <a href={`/projects/${project.slug}`} class="group block">
+            {project.data.image ? (
+              <img
+                src={project.data.image.src}
+                alt={project.data.imageAlt ?? project.data.title}
+                width={800}
+                height={400}
+                loading="lazy"
+                class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]"
+              />
+            ) : (
+              <div class="bg-muted text-muted-foreground flex h-48 w-full items-center justify-center text-sm">
+                No image available
+              </div>
+            )}
           </a>
-          <p class="text-muted-foreground mt-1">{project.data.description}</p>
-        </li>
+          <div class="flex flex-1 flex-col gap-4 p-4">
+            <div class="space-y-2">
+              <div class="text-muted-foreground text-xs">
+                <time datetime={project.data.date.toISOString()}>
+                  {project.data.date.toLocaleDateString()}
+                </time>
+              </div>
+              <h2 class="text-lg font-semibold">
+                <a
+                  href={`/projects/${project.slug}`}
+                  class="hover:text-primary"
+                >
+                  {project.data.title}
+                </a>
+              </h2>
+              <p class="text-muted-foreground text-sm">
+                {project.data.description}
+              </p>
+            </div>
+            <div class="mt-auto flex flex-wrap items-center gap-2">
+              {project.data.tags.map((tag) => (
+                <span class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs">
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <div class="flex flex-wrap items-center gap-3 text-sm">
+              {project.data.repoLink ? (
+                <a
+                  class="link-underline"
+                  href={project.data.repoLink}
+                  rel="noopener"
+                  target="_blank"
+                >
+                  Repository
+                </a>
+              ) : null}
+              {project.data.demoLink ? (
+                <a
+                  class="link-underline"
+                  href={project.data.demoLink}
+                  rel="noopener"
+                  target="_blank"
+                >
+                  Live demo
+                </a>
+              ) : null}
+            </div>
+          </div>
+        </article>
       ))
     }
-  </ul>
+  </div>
 </MainLayout>
