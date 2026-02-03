@@ -18,8 +18,6 @@ repoLink: https://github.com/Matthieusz/labsync
 demoLink: https://labsync.informati.dev
 ---
 
-# Labsync
-
 **Labsync** is a comprehensive web application designed to help students organize their work and communication within university laboratory groups. It bridges the gap between casual social platforms and rigid educational management systems, offering a solution tailored specifically for student self-organization.
 
 ## The Problem

@@ -18,8 +18,6 @@ repoLink: https://github.com/Matthieusz/tepirek-revamped
 demoLink: https://gz.informati.dev
 ---
 
-# Tepirek Revamped
-
 **Tepirek Revamped** is a comprehensive clan management dashboard designed for the MMORPG _Margonem_. Built as a modern web application, it streamlines coordination for clan members by providing tools for squad organization, character tracking, and event management.
 
 ## Key Features
