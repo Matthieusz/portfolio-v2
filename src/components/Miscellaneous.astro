@@ -21,14 +21,16 @@ import TicTacToe from "./TicTacToe.tsx";
     ></path><path d="M17 4l-4 16"></path></svg
   >Miscellaneous
 </h2>
-<div class="grid grid-cols-1 items-stretch gap-4 md:grid-cols-5">
+<div
+  class="6xl:grid-cols-5 grid grid-cols-1 items-stretch gap-4 md:grid-cols-4"
+>
   <div class="md:col-span-2">
     <SpotifyNowPlaying />
   </div>
   <div class="md:col-span-2">
     <LocationMap />
   </div>
-  <div>
+  <div class="6xl:col-span-1 md:col-span-2">
     <TicTacToe client:idle />
   </div>
 </div>
