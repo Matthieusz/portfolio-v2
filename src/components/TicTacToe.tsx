@@ -69,7 +69,7 @@ const getAIMove = (board: Board): number => {
   if (empty.length === 0) return -1;
 
   // Make AI beatable: 30% chance to make a random move
-  if (Math.random() < 0.3) {
+  if (Math.random() < 0.1) {
     return empty[Math.floor(Math.random() * empty.length)];
   }
 
