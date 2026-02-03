@@ -40,6 +40,7 @@ const featuredProjects = (
                 format="webp"
                 width={800}
                 height={400}
+                transition:name={`project-${project.slug}-image`}
                 class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]"
               />
             </a>
@@ -50,7 +51,10 @@ const featuredProjects = (
                     {project.data.date.toLocaleDateString()}
                   </time>
                 </div>
-                <h3 class="text-lg font-semibold">
+                <h3
+                  class="text-lg font-semibold"
+                  transition:name={`project-${project.slug}-title`}
+                >
                   <a
                     href={`/projects/${project.slug}`}
                     class="hover:text-primary"

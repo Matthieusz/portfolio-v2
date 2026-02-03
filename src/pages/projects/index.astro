@@ -26,6 +26,7 @@ const projects = (await getCollection("projects")).sort(
                 width={800}
                 height={400}
                 loading="lazy"
+                transition:name={`project-${project.slug}-image`}
                 class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]"
               />
             ) : (
@@ -41,7 +42,10 @@ const projects = (await getCollection("projects")).sort(
                   {project.data.date.toLocaleDateString()}
                 </time>
               </div>
-              <h2 class="text-lg font-semibold">
+              <h2
+                class="text-lg font-semibold"
+                transition:name={`project-${project.slug}-title`}
+              >
                 <a
                   href={`/projects/${project.slug}`}
                   class="hover:text-primary"
