@@ -1,27 +1,102 @@
 ---
+import ArrowRight from "@/icons/ArrowRight.astro";
+import Github from "@/icons/Github.astro";
+import Hashtag from "@/icons/Hashtag.astro";
+import Link from "@/icons/Link.astro";
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
 
+const featuredProjects = (
+  await getCollection("projects", ({ data }) => data.featured)
+).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 ---
 
 <div>
-  <h2 class="mb-4 flex items-center gap-2 text-3xl font-bold md:text-4xl">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="var(--primary)"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      class="icon icon-tabler icons-tabler-outline icon-tabler-hash"
-      ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
-        d="M5 9l14 0"></path><path d="M5 15l14 0"></path><path d="M11 4l-4 16"
-      ></path><path d="M17 4l-4 16"></path></svg
-    >Featured Projects
-  </h2>
-  <div class="grid-cols-2 items-center gap-4 md:grid">
-    <div>Project 1</div>
-    <div>Project 2</div>
+  <div class="flex items-center justify-between">
+    <h2 class="mb-4 flex items-center gap-2 text-3xl font-bold md:text-4xl">
+      <Hashtag /> Featured Projects
+    </h2>
+    <a href="/projects">
+      <span
+        class="text-foreground hover:text-primary link-underline flex items-center gap-1 text-sm transition-colors"
+      >
+        View all projects <ArrowRight size={16} color="var(--foreground)" />
+      </span>
+    </a>
+  </div>
+  <div class="grid gap-4 md:grid-cols-2">
+    {
+      featuredProjects.length === 0 ? (
+        <p class="text-muted-foreground">No featured projects yet.</p>
+      ) : (
+        featuredProjects.map((project) => (
+          <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
+            <a href={`/projects/${project.slug}`} class="group block">
+              <Image
+                src={
+                  project.data.image ?? "/assets/images/project-placeholder.png"
+                }
+                alt={project.data.imageAlt ?? project.data.title}
+                format="webp"
+                width={800}
+                height={400}
+                class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]"
+              />
+            </a>
+            <div class="flex flex-1 flex-col gap-4 p-4">
+              <div class="space-y-2">
+                <div class="text-muted-foreground text-xs">
+                  <time datetime={project.data.date.toISOString()}>
+                    {project.data.date.toLocaleDateString()}
+                  </time>
+                </div>
+                <h3 class="text-lg font-semibold">
+                  <a
+                    href={`/projects/${project.slug}`}
+                    class="hover:text-primary"
+                  >
+                    {project.data.title}
+                  </a>
+                </h3>
+                <p class="text-muted-foreground text-sm">
+                  {project.data.description}
+                </p>
+              </div>
+              <div class="mt-auto flex flex-wrap items-center gap-2">
+                {project.data.tags.map((tag) => (
+                  <span class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div class="flex flex-wrap items-center gap-3 text-sm">
+                {project.data.repoLink ? (
+                  <a
+                    class="link-underline flex items-center gap-2"
+                    href={project.data.repoLink}
+                    rel="noopener"
+                    target="_blank"
+                  >
+                    <Github size={16} color="var(--foreground)" />
+                    Repository
+                  </a>
+                ) : null}
+                {project.data.demoLink ? (
+                  <a
+                    class="link-underline flex items-center gap-1"
+                    href={project.data.demoLink}
+                    rel="noopener"
+                    target="_blank"
+                  >
+                    <Link size={16} color="var(--foreground)" />
+                    Live demo
+                  </a>
+                ) : null}
+              </div>
+            </div>
+          </article>
+        ))
+      )
+    }
   </div>
 </div>

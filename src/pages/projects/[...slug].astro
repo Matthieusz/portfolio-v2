@@ -1,0 +1,100 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import Image from "astro/components/Image.astro";
+import { getCollection, getEntry } from "astro:content";
+
+export const getStaticPaths = async () => {
+  const projects = await getCollection("projects");
+
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+  }));
+};
+
+const { slug } = Astro.params;
+type ProjectData = {
+  title: string;
+  description: string;
+  date: Date;
+  image?: string | null;
+  imageAlt?: string | null;
+  tags: string[];
+  featured?: boolean;
+  repoLink?: string;
+  demoLink?: string;
+};
+
+const getEntryBySlugUnsafe = getEntry as (
+  collection: string,
+  entrySlug: string,
+) => Promise<
+  | {
+      data: ProjectData;
+      render: () => Promise<{ Content: any }>;
+    }
+  | undefined
+>;
+
+const project = await getEntryBySlugUnsafe("projects", slug ?? "");
+
+if (!project) {
+  return Astro.redirect("/projects");
+}
+
+const { Content } = await project.render();
+const { description, date, demoLink, repoLink, tags, title } = project.data;
+---
+
+<MainLayout>
+  <Image
+    src={project.data.image ?? "/assets/images/project-placeholder.png"}
+    alt={project.data.imageAlt ?? "Project image"}
+    width={800}
+    height={400}
+    class="mb-8 rounded-md object-cover"
+  />
+  <article class="prose prose-invert max-w-none">
+    <header class="mb-6 space-y-3">
+      <h1 class="text-3xl font-bold">{title}</h1>
+      <p class="text-muted-foreground">{description}</p>
+      <div class="flex flex-wrap items-center gap-3 text-sm">
+        <time datetime={date.toISOString()}>{date.toLocaleDateString()}</time>
+        {
+          repoLink ? (
+            <a
+              class="link-underline"
+              href={repoLink}
+              rel="noopener"
+              target="_blank"
+            >
+              Repository
+            </a>
+          ) : null
+        }
+        {
+          demoLink ? (
+            <a
+              class="link-underline"
+              href={demoLink}
+              rel="noopener"
+              target="_blank"
+            >
+              Live demo
+            </a>
+          ) : null
+        }
+      </div>
+      <div class="flex flex-wrap gap-2">
+        {
+          tags.map((tag) => (
+            <span class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs">
+              {tag}
+            </span>
+          ))
+        }
+      </div>
+    </header>
+
+    <Content />
+  </article>
+</MainLayout>
