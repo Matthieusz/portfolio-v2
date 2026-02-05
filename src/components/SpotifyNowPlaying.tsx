@@ -292,7 +292,7 @@ const SpotifyNowPlaying: Component<SpotifyNowPlayingProps> = (props) => {
             BEEP BOOP
           </div>
           <InfoTooltip
-            content="Made using Spotify API"
+            content="Built with Spotify API"
             size="16"
             color="var(--foreground)"
           />
