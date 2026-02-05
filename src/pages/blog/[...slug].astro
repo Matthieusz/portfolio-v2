@@ -1,0 +1,54 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import { getCollection, getEntry } from "astro:content";
+
+export const getStaticPaths = async () => {
+  const posts = await getCollection("posts");
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+  }));
+};
+
+const { slug } = Astro.params;
+
+const post = await getEntry("posts", slug ?? "");
+
+if (!post) {
+  return Astro.redirect("/blog");
+}
+
+const { Content } = await post.render();
+const { date, description, tags, title } = post.data;
+---
+
+<MainLayout>
+  <article
+    class="bg-card border-border mx-auto my-12 max-w-4xl overflow-hidden rounded-lg border p-6"
+  >
+    <header class="mb-6 space-y-3">
+      <h1 class="text-3xl font-bold">{title}</h1>
+      <p class="text-muted-foreground">{description}</p>
+      <div
+        class="text-muted-foreground flex flex-wrap items-center gap-3 text-sm"
+      >
+        <time datetime={date.toISOString()}
+          >Publish date: {date.toLocaleDateString("pl-PL")}</time
+        >
+      </div>
+      <div class="flex flex-wrap gap-2">
+        {
+          tags.map((tag) => (
+            <span class="bg-secondary text-secondary-foreground rounded-lg px-3 py-1 text-sm">
+              {tag}
+            </span>
+          ))
+        }
+      </div>
+    </header>
+
+    <div class="prose prose-invert max-w-none">
+      <Content />
+    </div>
+  </article>
+</MainLayout>
