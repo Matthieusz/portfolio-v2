@@ -201,6 +201,7 @@ const SpotifyNowPlaying: Component<SpotifyNowPlayingProps> = (props) => {
 
   // Poll for updates
   createEffect(() => {
+    fetchNowPlaying();
     const pollInterval = setInterval(fetchNowPlaying, POLL_INTERVAL);
     onCleanup(() => clearInterval(pollInterval));
   });

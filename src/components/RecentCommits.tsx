@@ -170,6 +170,7 @@ const RecentCommits: Component<RecentCommitsProps> = (props) => {
   };
 
   createEffect(() => {
+    fetchCommits();
     const interval = setInterval(fetchCommits, POLL_INTERVAL);
     onCleanup(() => clearInterval(interval));
   });
