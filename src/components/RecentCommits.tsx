@@ -69,7 +69,6 @@ const CommitIcon: Component = () => (
 
 const EmptyState: Component<{ message: string }> = (props) => (
   <div class="text-muted-foreground flex items-center gap-3">
-    <CommitIcon />
     <span>{props.message}</span>
   </div>
 );
