@@ -1,0 +1,8 @@
+---
+import { getRecentCommits } from "../lib/katib";
+import RecentCommitsComponent from "./RecentCommits.tsx";
+
+const initialData = await getRecentCommits(5);
+---
+
+<RecentCommitsComponent client:idle initialData={initialData} />

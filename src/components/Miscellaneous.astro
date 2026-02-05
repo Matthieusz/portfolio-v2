@@ -1,5 +1,6 @@
 ---
 import LocationMap from "./LocationMap.astro";
+import RecentCommits from "./RecentCommits.astro";
 import SpotifyNowPlaying from "./SpotifyNowPlaying.astro";
 import TicTacToe from "./TicTacToe.tsx";
 ---
@@ -21,16 +22,23 @@ import TicTacToe from "./TicTacToe.tsx";
     ></path><path d="M17 4l-4 16"></path></svg
   >Miscellaneous
 </h2>
-<div
-  class="6xl:grid-cols-5 grid grid-cols-1 items-stretch gap-4 md:grid-cols-4"
->
-  <div class="md:col-span-2">
-    <SpotifyNowPlaying />
+<div class="mb-8 flex flex-col gap-4">
+  <div
+    class="6xl:grid-cols-5 grid grid-cols-1 items-stretch gap-4 md:grid-cols-4"
+  >
+    <div class="md:col-span-2">
+      <SpotifyNowPlaying />
+    </div>
+    <div class="md:col-span-2">
+      <LocationMap />
+    </div>
+    <div class="6xl:col-span-1 md:col-span-2">
+      <TicTacToe client:idle />
+    </div>
   </div>
-  <div class="md:col-span-2">
-    <LocationMap />
-  </div>
-  <div class="6xl:col-span-1 md:col-span-2">
-    <TicTacToe client:idle />
+  <div class="6xl:grid-cols-2 grid grid-cols-1 items-stretch gap-4">
+    <div>
+      <RecentCommits />
+    </div>
   </div>
 </div>
