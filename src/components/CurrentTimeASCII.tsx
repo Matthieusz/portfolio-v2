@@ -137,7 +137,7 @@ const CurrentTimeASCII: Component = () => {
       <pre class="text-foreground overflow-x-auto text-xs leading-tight whitespace-pre">
         {currentArt()}
       </pre>
-      <div class="text-muted-foreground mt-4 flex items-center justify-start gap-4 text-xs md:justify-center">
+      <div class="text-muted-foreground mt-4 flex items-center justify-center gap-4 text-xs">
         <span class="text-primary font-semibold">Poznań, Poland</span>
         {" — "}
         <span class="text-primary tabular-nums">
