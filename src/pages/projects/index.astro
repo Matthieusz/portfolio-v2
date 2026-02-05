@@ -1,6 +1,7 @@
 ---
 import Hashtag from "@/icons/Hashtag.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
+import Image from "astro/components/Image.astro";
 import { getCollection } from "astro:content";
 
 const projects = (await getCollection("projects")).sort(
@@ -19,7 +20,7 @@ const projects = (await getCollection("projects")).sort(
         <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
           <a href={`/projects/${project.slug}`} class="group block">
             {project.data.image ? (
-              <img
+              <Image
                 src={project.data.image.src}
                 alt={project.data.imageAlt ?? project.data.title}
                 width={800}
@@ -68,7 +69,7 @@ const projects = (await getCollection("projects")).sort(
                 <a
                   class="link-underline"
                   href={project.data.repoLink}
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   target="_blank"
                 >
                   Repository
@@ -78,7 +79,7 @@ const projects = (await getCollection("projects")).sort(
                 <a
                   class="link-underline"
                   href={project.data.demoLink}
-                  rel="noopener"
+                  rel="noopener noreferrer"
                   target="_blank"
                 >
                   Live demo
