@@ -67,6 +67,32 @@ const CommitIcon: Component = () => (
   </svg>
 );
 
+const InfoTooltip: Component<{ content: string }> = (props) => (
+  <span class="group relative inline-flex items-center">
+    <span class="sr-only">{props.content}</span>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="var(--foreground)"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+      <path d="M12 9h.01"></path>
+      <path d="M11 12h1v4h1"></path>
+    </svg>
+    <span class="bg-background text-foreground pointer-events-none absolute top-1/2 right-full z-10 mr-2 -translate-y-1/2 whitespace-nowrap rounded px-2 py-1 text-[0.65rem] opacity-0 shadow transition-opacity duration-150 group-hover:opacity-100">
+      {props.content}
+    </span>
+  </span>
+);
+
 const EmptyState: Component<{ message: string }> = (props) => (
   <div class="text-muted-foreground flex items-center gap-3">
     <span>{props.message}</span>
@@ -180,9 +206,12 @@ const RecentCommits: Component<RecentCommitsProps> = (props) => {
   return (
     <div class="bg-card border-border relative flex h-full flex-col gap-3 overflow-hidden rounded-lg border p-4">
       <div class="relative z-10">
-        <h3 class="text-muted-foreground flex items-center gap-2 text-xs font-medium tracking-wider uppercase">
-          <CommitIcon />
-          Recent Commits
+        <h3 class="text-muted-foreground flex items-center justify-between gap-2 text-xs font-medium tracking-wider uppercase">
+          <div class="flex items-center gap-2">
+            <CommitIcon />
+            Recent Commits
+          </div>
+          <InfoTooltip content="Built with Katib API and GitHub data" />
         </h3>
       </div>
 

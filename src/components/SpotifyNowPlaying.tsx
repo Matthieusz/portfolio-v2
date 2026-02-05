@@ -151,6 +151,36 @@ const MusicIcon: Component = () => (
   </svg>
 );
 
+const InfoTooltip: Component<{
+  size: string;
+  color?: string;
+  content: string;
+}> = (props) => (
+  <span class="group relative inline-flex items-center">
+    <span class="sr-only">{props.content}</span>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={props.size ?? "24"}
+      height={props.size ?? "24"}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={props.color ?? "currentColor"}
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="icon icon-tabler icons-tabler-outline icon-tabler-info-circle"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+      <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
+      <path d="M12 9h.01"></path>
+      <path d="M11 12h1v4h1"></path>
+    </svg>
+    <span class="bg-background text-foreground pointer-events-none absolute top-1/2 right-full z-10 mr-2 -translate-y-1/2 rounded px-2 py-1 text-[0.65rem] whitespace-nowrap opacity-0 shadow transition-opacity duration-150 group-hover:opacity-100">
+      {props.content}
+    </span>
+  </span>
+);
+
 const NotPlayingState: Component = () => (
   <div class="text-muted-foreground flex items-center gap-3">
     <svg class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
@@ -223,9 +253,7 @@ const SpotifyNowPlaying: Component<SpotifyNowPlayingProps> = (props) => {
 
   // Check scroll on data change and window resize
   createEffect(() => {
-    // Re-run when data changes
     data();
-    // Use setTimeout to wait for DOM update
     setTimeout(checkTitleScroll, 0);
   });
 
@@ -258,9 +286,16 @@ const SpotifyNowPlaying: Component<SpotifyNowPlayingProps> = (props) => {
       />
 
       <div class="relative z-10">
-        <h3 class="text-muted-foreground flex items-center gap-2 text-xs font-medium tracking-wider uppercase">
-          <MusicIcon />
-          BEEP BOOP
+        <h3 class="text-muted-foreground flex items-center justify-between gap-2 text-xs font-medium tracking-wider uppercase">
+          <div class="flex items-center gap-2">
+            <MusicIcon />
+            BEEP BOOP
+          </div>
+          <InfoTooltip
+            content="Made using Spotify API"
+            size="16"
+            color="var(--foreground)"
+          />
         </h3>
       </div>
 
