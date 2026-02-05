@@ -1,6 +1,7 @@
 ---
 import LocationMap from "./LocationMap.astro";
 import RecentCommits from "./RecentCommits.astro";
+import RecentPosts from "./RecentPosts.astro";
 import SpotifyNowPlaying from "./SpotifyNowPlaying.astro";
 import TicTacToe from "./TicTacToe.tsx";
 ---
@@ -36,9 +37,14 @@ import TicTacToe from "./TicTacToe.tsx";
       <TicTacToe client:idle />
     </div>
   </div>
-  <div class="6xl:grid-cols-2 grid grid-cols-1 items-stretch gap-4">
+  <div
+    class="6xl:grid-cols-2 grid grid-cols-1 items-stretch gap-4 md:grid-cols-2"
+  >
     <div>
       <RecentCommits />
+    </div>
+    <div>
+      <RecentPosts />
     </div>
   </div>
 </div>
