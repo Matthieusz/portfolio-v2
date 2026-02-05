@@ -95,19 +95,60 @@ const {
   </div>
 </div>
 
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-  crossorigin=""
-/>
-<script
-  is:inline
-  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-  crossorigin=""></script>
-
 <script is:inline>
+  const LEAFLET_CSS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+  const LEAFLET_JS_URL = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+  const LEAFLET_CSS_INTEGRITY =
+    "sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=";
+  const LEAFLET_JS_INTEGRITY =
+    "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
+
+  const loadLeafletCss = () =>
+    new Promise((resolve) => {
+      const existing = document.querySelector("link[data-leaflet-css='true']");
+      if (existing) {
+        resolve();
+        return;
+      }
+
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = LEAFLET_CSS_URL;
+      link.integrity = LEAFLET_CSS_INTEGRITY;
+      link.crossOrigin = "";
+      link.dataset.leafletCss = "true";
+      link.onload = () => resolve();
+      link.onerror = () => resolve();
+      document.head.appendChild(link);
+    });
+
+  const loadLeafletScript = () =>
+    new Promise((resolve) => {
+      const existing = document.querySelector("script[data-leaflet-js='true']");
+      if (existing) {
+        if (window.L) {
+          resolve();
+        } else {
+          existing.addEventListener("load", () => resolve(), { once: true });
+          existing.addEventListener("error", () => resolve(), { once: true });
+        }
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = LEAFLET_JS_URL;
+      script.integrity = LEAFLET_JS_INTEGRITY;
+      script.crossOrigin = "";
+      script.dataset.leafletJs = "true";
+      script.onload = () => resolve();
+      script.onerror = () => resolve();
+      document.body.appendChild(script);
+    });
+
+  const ensureLeafletLoaded = async () => {
+    await Promise.all([loadLeafletCss(), loadLeafletScript()]);
+  };
+
   const initLocationMap = () => {
     const container = document.getElementById("location-map");
     const mapElement = document.getElementById("map");
@@ -139,8 +180,30 @@ const {
     ).addTo(map);
   };
 
-  document.addEventListener("DOMContentLoaded", initLocationMap);
-  document.addEventListener("astro:page-load", initLocationMap);
+  const setupMapObserver = () => {
+    const container = document.getElementById("location-map");
+    if (!container) return;
+    if (container.dataset.mapLoaded === "true") return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry?.isIntersecting) return;
+        observer.disconnect();
+        container.dataset.mapLoaded = "true";
+
+        ensureLeafletLoaded()
+          .then(() => initLocationMap())
+          .catch(() => undefined);
+      },
+      { rootMargin: "200px" },
+    );
+
+    observer.observe(container);
+  };
+
+  document.addEventListener("DOMContentLoaded", setupMapObserver);
+  document.addEventListener("astro:page-load", setupMapObserver);
 </script>
 
 <style>

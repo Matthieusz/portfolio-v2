@@ -1,14 +1,9 @@
 ---
-import { getRecentCommits } from "../lib/katib";
-import { getNowPlaying } from "../lib/spotify";
 import LocationMap from "./LocationMap.astro";
 import RecentCommits from "./RecentCommits.tsx";
 import RecentPosts from "./RecentPosts.astro";
 import SpotifyNowPlaying from "./SpotifyNowPlaying.tsx";
 import TicTacToe from "./TicTacToe.tsx";
-
-const initialSpotifyData = await getNowPlaying();
-const initialKatibData = await getRecentCommits(5);
 ---
 
 <h2 class="mb-4 flex items-center gap-2 text-3xl font-bold md:text-4xl">
@@ -33,7 +28,7 @@ const initialKatibData = await getRecentCommits(5);
     class="6xl:grid-cols-5 grid grid-cols-1 items-stretch gap-4 md:grid-cols-4"
   >
     <div class="md:col-span-2">
-      <SpotifyNowPlaying client:idle initialData={initialSpotifyData} />
+      <SpotifyNowPlaying client:idle initialData={null} />
     </div>
     <div class="md:col-span-2">
       <LocationMap client:idle />
@@ -46,7 +41,7 @@ const initialKatibData = await getRecentCommits(5);
     class="6xl:grid-cols-2 grid grid-cols-1 items-stretch gap-4 md:grid-cols-2"
   >
     <div>
-      <RecentCommits client:idle initialData={initialKatibData} />
+      <RecentCommits client:idle initialData={null} />
     </div>
     <div>
       <RecentPosts client:idle />
