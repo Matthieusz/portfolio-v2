@@ -36,6 +36,14 @@ const isCommitLike = (record: UnknownRecord): boolean =>
     pickString(record, ["repo", "repository", "project"]),
   );
 
+const parseJsonSafely = async <T>(response: Response): Promise<T | null> => {
+  try {
+    return (await response.json()) as T;
+  } catch {
+    return null;
+  }
+};
+
 export interface RecentCommit {
   message: string;
   repo: string;
@@ -177,7 +185,8 @@ export async function getRecentCommits(
   const response = await fetch(url.toString(), { headers });
   if (!response.ok) return null;
 
-  const payload: unknown = await response.json();
+  const payload = await parseJsonSafely<unknown>(response);
+  if (!payload) return null;
   const commits = parseCommits(payload);
   const totalCommits = isRecord(payload)
     ? pickNumber(payload, ["totalCommits", "total_commits", "count"])

@@ -60,6 +60,14 @@ interface QueueResponse {
   queue: SpotifyTrack[];
 }
 
+const parseJsonSafely = async <T>(response: Response): Promise<T | null> => {
+  try {
+    return (await response.json()) as T;
+  } catch {
+    return null;
+  }
+};
+
 export interface TrackInfo {
   title: string;
   artist: string;
@@ -84,7 +92,7 @@ export interface NowPlayingData {
   upNext?: TrackInfo;
 }
 
-async function getAccessToken(): Promise<SpotifyToken> {
+async function getAccessToken(): Promise<SpotifyToken | null> {
   const response = await fetch(TOKEN_ENDPOINT, {
     method: "POST",
     headers: {
@@ -97,7 +105,11 @@ async function getAccessToken(): Promise<SpotifyToken> {
     }),
   });
 
-  const data = await response.json();
+  if (!response.ok) return null;
+
+  const data = await parseJsonSafely<SpotifyToken>(response);
+  if (!data?.access_token) return null;
+
   return data;
 }
 
@@ -123,7 +135,8 @@ async function getQueue(
 
     if (!response.ok) return null;
 
-    const data: QueueResponse = await response.json();
+    const data = await parseJsonSafely<QueueResponse>(response);
+    if (!data) return null;
 
     return {
       upNext: data.queue[0] ? trackToInfo(data.queue[0]) : undefined,
@@ -145,7 +158,8 @@ async function getRecentTracks(
 
     if (!response.ok) return null;
 
-    const data: RecentlyPlayedResponse = await response.json();
+    const data = await parseJsonSafely<RecentlyPlayedResponse>(response);
+    if (!data) return null;
 
     return {
       previousTrack: data.items[0]
@@ -159,7 +173,9 @@ async function getRecentTracks(
 
 export async function getNowPlaying(): Promise<NowPlayingData | null> {
   try {
-    const { access_token } = await getAccessToken();
+    const token = await getAccessToken();
+    if (!token) return null;
+    const { access_token } = token;
 
     // Try to get currently playing track
     const currentlyPlayingResponse = await fetch(NOW_PLAYING_ENDPOINT, {
@@ -180,8 +196,10 @@ export async function getNowPlaying(): Promise<NowPlayingData | null> {
       return null;
     }
 
-    const data: CurrentlyPlayingResponse =
-      await currentlyPlayingResponse.json();
+    const data = await parseJsonSafely<CurrentlyPlayingResponse>(
+      currentlyPlayingResponse,
+    );
+    if (!data) return null;
 
     // No track data or it's an ad/podcast
     if (!data.item) {
@@ -227,7 +245,8 @@ async function getRecentlyPlayed(
       return null;
     }
 
-    const data: RecentlyPlayedResponse = await response.json();
+    const data = await parseJsonSafely<RecentlyPlayedResponse>(response);
+    if (!data) return null;
     const tracks = data.items;
 
     if (!tracks || tracks.length === 0) {
