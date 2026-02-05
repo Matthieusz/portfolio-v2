@@ -1,8 +1,0 @@
----
-import { getNowPlaying } from "../lib/spotify";
-import SpotifyNowPlayingComponent from "./SpotifyNowPlaying.tsx";
-
-const initialData = await getNowPlaying();
----
-
-<SpotifyNowPlayingComponent client:idle initialData={initialData} />
