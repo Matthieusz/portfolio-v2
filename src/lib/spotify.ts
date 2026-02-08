@@ -1,3 +1,5 @@
+import { parseJsonSafely } from "./utils";
+
 const CLIENT_ID = import.meta.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = import.meta.env.SPOTIFY_CLIENT_SECRET;
 const REFRESH_TOKEN = import.meta.env.SPOTIFY_REFRESH_TOKEN;
@@ -59,14 +61,6 @@ interface QueueResponse {
   currently_playing: SpotifyTrack | null;
   queue: SpotifyTrack[];
 }
-
-const parseJsonSafely = async <T>(response: Response): Promise<T | null> => {
-  try {
-    return (await response.json()) as T;
-  } catch {
-    return null;
-  }
-};
 
 export interface TrackInfo {
   title: string;
@@ -225,8 +219,7 @@ export async function getNowPlaying(): Promise<NowPlayingData | null> {
       previousTrack: recentData?.previousTrack,
       upNext: queueData?.upNext,
     };
-  } catch (error) {
-    console.error("Error fetching now playing:", error);
+  } catch {
     return null;
   }
 }
@@ -266,8 +259,7 @@ async function getRecentlyPlayed(
       trackId: track.id,
       previousTrack: tracks[1] ? trackToInfo(tracks[1].track) : undefined,
     };
-  } catch (error) {
-    console.error("Error fetching recently played:", error);
+  } catch {
     return null;
   }
 }

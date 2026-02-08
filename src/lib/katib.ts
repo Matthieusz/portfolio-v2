@@ -1,3 +1,5 @@
+import { parseJsonSafely } from "./utils";
+
 const KATIB_BASE_URL = "https://katib.jasoncameron.dev";
 const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN;
 const GITHUB_USERNAME = import.meta.env.GITHUB_USERNAME ?? "Matthieusz";
@@ -35,14 +37,6 @@ const isCommitLike = (record: UnknownRecord): boolean =>
     pickString(record, ["oid", "sha", "id"]) ||
     pickString(record, ["repo", "repository", "project"]),
   );
-
-const parseJsonSafely = async <T>(response: Response): Promise<T | null> => {
-  try {
-    return (await response.json()) as T;
-  } catch {
-    return null;
-  }
-};
 
 export interface RecentCommit {
   message: string;

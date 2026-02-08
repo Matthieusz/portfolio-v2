@@ -4,7 +4,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --font-sans: "JetBrains Mono Variable", monospace;
+  --font-mono: "JetBrains Mono Variable", monospace;
 }
 
 @theme {
