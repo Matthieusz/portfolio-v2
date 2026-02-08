@@ -116,12 +116,7 @@ const CurrentTimeASCII: Component = () => {
     return getTimeOfDay(currentTime());
   });
 
-  const currentArt = createMemo(() =>
-    ASCII_ART[currentPeriod()]
-      .split("\n")
-      .map((line) => line.trimEnd())
-      .join("\n"),
-  );
+  const currentArt = createMemo(() => ASCII_ART[currentPeriod()]);
 
   const cyclePeriod = () => {
     const current = manualPeriod() ?? getTimeOfDay(currentTime());
