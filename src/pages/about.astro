@@ -1,5 +1,30 @@
 ---
 import MainLayout from "@/layouts/MainLayout.astro";
+import Image from "astro/components/Image.astro";
+import MateuszIrski from "../content/images/me.jpg";
 ---
 
-<MainLayout>About</MainLayout>
+<MainLayout>
+  <section class="mx-auto mt-12 flex max-w-6xl flex-col items-start gap-4">
+    <h1 class="text-4xl font-bold">About Me</h1>
+    <div class="flex w-full gap-4">
+      <div class="w-[40%]">
+        <Image
+          src={MateuszIrski}
+          alt="Mateusz Irski"
+          width={400}
+          height={400}
+        />
+      </div>
+      <div class="w-[60%]">
+        <p class="mt-4 text-lg">
+          Hi! I'm Mateusz, a software developer with a passion for creating
+          innovative solutions. I have experience in various programming
+          languages and frameworks, and I enjoy working on both frontend and
+          backend projects. In my free time, I like to explore new technologies
+          and contribute to open-source projects.
+        </p>
+      </div>
+    </div>
+  </section>
+</MainLayout>
