@@ -20,7 +20,7 @@ import "../styles/global.css";
   </head>
   <body class="min-h-screen">
     <Header transition:name="site-header" />
-    <div class="mx-auto flex min-h-screen max-w-[95%] flex-col md:max-w-[80%]">
+    <div class="mx-auto flex max-w-[95%] flex-col md:max-w-[80%]">
       <slot />
       <Footer transition:name="site-footer" />
     </div>
