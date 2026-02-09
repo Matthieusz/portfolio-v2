@@ -90,8 +90,9 @@ const currentYear = new Date().getFullYear();
       .join(":");
   }
 
-  let sessionStart = Date.now();
-  let storedTime = getStoredTime();
+  const sessionStart = Date.now();
+  const storedTime = getStoredTime();
+  let intervalId: ReturnType<typeof setInterval> | null = null;
 
   function updateDisplay() {
     const timeEl = document.getElementById("footer-time");
@@ -103,14 +104,22 @@ const currentYear = new Date().getFullYear();
     }
   }
 
-  updateDisplay();
-  const intervalId = setInterval(updateDisplay, 1000);
+  function startTimer() {
+    if (intervalId) {
+      clearInterval(intervalId);
+    }
+    updateDisplay();
+    intervalId = setInterval(updateDisplay, 1000);
+  }
 
-  const handleCleanup = () => {
-    clearInterval(intervalId);
-    document.removeEventListener("astro:before-swap", handleCleanup);
-  };
+  function stopTimer() {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  }
 
-  document.addEventListener("astro:before-swap", handleCleanup);
-  window.addEventListener("beforeunload", handleCleanup);
+  document.addEventListener("astro:page-load", startTimer);
+  document.addEventListener("astro:before-swap", stopTimer);
+  window.addEventListener("beforeunload", stopTimer);
 </script>
