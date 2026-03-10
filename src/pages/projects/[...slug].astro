@@ -2,13 +2,13 @@
 import Github from "@/icons/Github.astro";
 import Link from "@/icons/Link.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
-import { getCollection, getEntry } from "astro:content";
+import { getCollection, getEntry, render } from "astro:content";
 
 export const getStaticPaths = async () => {
   const projects = await getCollection("projects");
 
   return projects.map((project) => ({
-    params: { slug: project.slug },
+    params: { slug: project.id },
   }));
 };
 
@@ -20,7 +20,7 @@ if (!project) {
   return Astro.redirect("/projects");
 }
 
-const { Content } = await project.render();
+const { Content } = await render(project);
 const { date, demoLink, repoLink, tags, title } = project.data;
 ---
 
@@ -36,7 +36,7 @@ const { date, demoLink, repoLink, tags, title } = project.data;
           width={800}
           height={400}
           loading="lazy"
-          transition:name={`project-${project.slug}-image`}
+          transition:name={`project-${project.id}-image`}
           class="h-64 w-full object-cover"
         />
       ) : (
@@ -49,7 +49,7 @@ const { date, demoLink, repoLink, tags, title } = project.data;
       <header class="mb-6 space-y-3">
         <h1
           class="text-3xl font-bold"
-          transition:name={`project-${project.slug}-title`}
+          transition:name={`project-${project.id}-title`}
         >
           {title}
         </h1>
