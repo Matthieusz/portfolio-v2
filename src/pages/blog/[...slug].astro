@@ -1,12 +1,12 @@
 ---
 import MainLayout from "@/layouts/MainLayout.astro";
-import { getCollection, getEntry } from "astro:content";
+import { getCollection, getEntry, render } from "astro:content";
 
 export const getStaticPaths = async () => {
   const posts = await getCollection("posts");
 
   return posts.map((post) => ({
-    params: { slug: post.slug },
+    params: { slug: post.id },
   }));
 };
 
@@ -18,7 +18,7 @@ if (!post) {
   return Astro.redirect("/blog");
 }
 
-const { Content } = await post.render();
+const { Content } = await render(post);
 const { date, description, tags, title } = post.data;
 ---
 
