@@ -2,7 +2,7 @@
 import Hashtag from "@/icons/Hashtag.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
 import { Image } from "astro:assets";
-import MateuszIrski from "../content/images/me.jpg";
+import AboutMePic from "../content/images/me.jpg";
 ---
 
 <MainLayout>
@@ -12,20 +12,16 @@ import MateuszIrski from "../content/images/me.jpg";
     </h1>
     <div class="flex w-full gap-4">
       <div class="w-[40%]">
-        <Image
-          src={MateuszIrski}
-          alt="Mateusz Irski"
-          width={400}
-          height={400}
-        />
+        <Image src={AboutMePic} alt="Mateusz Irski" width={400} height={400} />
       </div>
       <div class="w-[60%]">
         <p class="mt-4 text-lg">
           Hi! I'm Mateusz, a software developer with a passion for creating
-          innovative solutions. I have experience in various programming
-          languages and frameworks, and I enjoy working on both frontend and
-          backend projects. In my free time, I like to explore new technologies
-          and contribute to open-source projects.
+          innovative solutions. I have experience mainly in Typescript and
+          various frameworks (recently loving Tanstack Start though), and I
+          enjoy working on both frontend and backend projects. When I'm not
+          coding you can catch me swimming, reading or playing some games with
+          friends.
         </p>
       </div>
     </div>
