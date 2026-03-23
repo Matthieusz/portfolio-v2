@@ -2,8 +2,6 @@
 title: Labsync
 description: Labsync is a web application supporting organization and communication in laboratory groups
 date: 2025-10-02
-image: ../images/labsync.png
-imageAlt: Dashboard of Labsync app
 tags:
   - convex
   - typescript

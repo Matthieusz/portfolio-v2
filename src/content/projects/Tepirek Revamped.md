@@ -2,8 +2,6 @@
 title: Tepirek Revamped
 description: Tepirek Revamped is an app designed for Margonem as a clan management tool
 date: 2025-08-04
-image: ../images/tepirek.png
-imageAlt: Dashboard View of Tepirek Revamped
 tags:
   - typescript
   - react

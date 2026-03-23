@@ -2,6 +2,7 @@
 import Github from "@/icons/Github.astro";
 import Link from "@/icons/Link.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
+import ProjectBanner from "@/components/ProjectBanner.astro";
 import { getCollection, getEntry, render } from "astro:content";
 
 export const getStaticPaths = async () => {
@@ -26,25 +27,9 @@ const { date, demoLink, repoLink, tags, title } = project.data;
 
 <MainLayout>
   <article
-    class="bg-card border-border mx-auto mb-12 max-w-4xl overflow-hidden rounded-lg border p-6"
+    class="bg-card border-border mx-auto mb-12 max-w-4xl overflow-hidden rounded-lg border"
   >
-    {
-      project.data.image ? (
-        <img
-          src={project.data.image.src}
-          alt={project.data.imageAlt ?? "Project image"}
-          width={800}
-          height={400}
-          loading="lazy"
-          transition:name={`project-${project.id}-image`}
-          class="h-64 w-full object-cover"
-        />
-      ) : (
-        <div class="bg-muted text-muted-foreground flex h-64 w-full items-center justify-center text-sm">
-          No image available
-        </div>
-      )
-    }
+    <ProjectBanner title={title} id={project.id} compact={false} />
     <div class="p-6">
       <header class="mb-6 space-y-3">
         <h1

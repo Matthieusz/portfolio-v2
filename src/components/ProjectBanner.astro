@@ -1,0 +1,76 @@
+---
+interface Props {
+  title: string;
+  id: string;
+  compact?: boolean;
+}
+
+const { title, id, compact = true } = Astro.props;
+
+// Catppuccin-inspired gradient pairs [from, to]
+const gradients: [string, string][] = [
+  ["#cba6f7", "#89b4fa"], // mauve → blue
+  ["#89b4fa", "#74c7ec"], // blue → sapphire
+  ["#74c7ec", "#94e2d5"], // sapphire → teal
+  ["#94e2d5", "#a6e3a1"], // teal → green
+  ["#fab387", "#f9e2af"], // peach → yellow
+  ["#f38ba8", "#cba6f7"], // red → mauve
+  ["#a6e3a1", "#89dceb"], // green → sky
+  ["#f5c2e7", "#cba6f7"], // pink → mauve
+];
+
+// Deterministic hash from title to pick a gradient
+const hash = title
+  .split("")
+  .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+const [fromColor, toColor] = gradients[hash % gradients.length]!;
+
+// Get up to 2 initials from words/segments
+const initials = title
+  .split(/[\s\-_]+/)
+  .map((word) => word[0] ?? "")
+  .join("")
+  .slice(0, 2)
+  .toUpperCase();
+---
+
+<div
+  class:list={[
+    "relative flex w-full items-center justify-center overflow-hidden select-none",
+    "transition-transform duration-300 group-hover:scale-[1.05]",
+    compact ? "h-48" : "h-64",
+  ]}
+  style={`background: linear-gradient(135deg, ${fromColor}, ${toColor});`}
+  transition:name={`project-${id}-image`}
+>
+  <!-- Dot grid texture -->
+  <div
+    class="absolute inset-0"
+    style="background-image: radial-gradient(circle, rgba(30,30,46,0.2) 1px, transparent 1px); background-size: 20px 20px;"
+  ></div>
+
+  <!-- Large faded initials watermark -->
+  <span
+    class="absolute font-mono font-black leading-none"
+    style="font-size: clamp(5rem, 18vw, 9rem); color: rgba(30,30,46,0.08); pointer-events: none;"
+    aria-hidden="true"
+  >
+    {initials}
+  </span>
+
+  <!-- Main label -->
+  <div class="relative z-10 flex flex-col items-center gap-1.5 px-4 text-center">
+    <span
+      class="font-mono text-xs tracking-[0.2em] uppercase"
+      style="color: rgba(30,30,46,0.5);"
+    >
+      ~/projects
+    </span>
+    <span
+      class="font-mono font-bold tracking-tight"
+      style={`font-size: ${compact ? "1.125rem" : "1.5rem"}; color: rgba(30,30,46,0.85); line-height: 1.2;`}
+    >
+      {title}
+    </span>
+  </div>
+</div>

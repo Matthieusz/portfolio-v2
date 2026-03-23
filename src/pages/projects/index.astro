@@ -1,6 +1,7 @@
 ---
 import Hashtag from "@/icons/Hashtag.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
+import ProjectBanner from "@/components/ProjectBanner.astro";
 import { getCollection } from "astro:content";
 
 const projects = (await getCollection("projects")).sort(
@@ -18,21 +19,11 @@ const projects = (await getCollection("projects")).sort(
       projects.map((project) => (
         <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
           <a href={`/projects/${project.id}`} class="group block">
-            {project.data.image ? (
-              <img
-                src={project.data.image.src}
-                alt={project.data.imageAlt ?? project.data.title}
-                width={800}
-                height={400}
-                loading="lazy"
-                transition:name={`project-${project.id}-image`}
-                class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]"
-              />
-            ) : (
-              <div class="bg-muted text-muted-foreground flex h-48 w-full items-center justify-center text-sm">
-                No image available
-              </div>
-            )}
+            <ProjectBanner
+              title={project.data.title}
+              id={project.id}
+              compact={true}
+            />
           </a>
           <div class="flex flex-1 flex-col gap-4 p-4">
             <div class="space-y-2">

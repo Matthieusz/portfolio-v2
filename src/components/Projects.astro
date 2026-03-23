@@ -3,7 +3,7 @@ import ArrowRight from "@/icons/ArrowRight.astro";
 import Github from "@/icons/Github.astro";
 import Hashtag from "@/icons/Hashtag.astro";
 import Link from "@/icons/Link.astro";
-import { Image } from "astro:assets";
+import ProjectBanner from "@/components/ProjectBanner.astro";
 import { getCollection } from "astro:content";
 
 const featuredProjects = (
@@ -34,16 +34,10 @@ const featuredProjects = (
         featuredProjects.map((project) => (
           <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
             <a href={`/projects/${project.id}`} class="group block">
-              <Image
-                src={
-                  project.data.image ?? "/assets/images/project-placeholder.png"
-                }
-                alt={project.data.imageAlt ?? project.data.title}
-                format="webp"
-                width={800}
-                height={400}
-                transition:name={`project-${project.id}-image`}
-                class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-[1.05]"
+              <ProjectBanner
+                title={project.data.title}
+                id={project.id}
+                compact={true}
               />
             </a>
             <div class="flex flex-1 flex-col gap-4 p-4">
