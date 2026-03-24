@@ -4,6 +4,8 @@ import MainLayout from "@/layouts/MainLayout.astro";
 import ProjectBanner from "@/components/ProjectBanner.astro";
 import { slugify } from "@/lib/utils";
 import { getCollection } from "astro:content";
+import Github from "@/icons/Github.astro";
+import Link from "@/icons/Link.astro";
 
 const projects = (await getCollection("projects")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
@@ -15,10 +17,10 @@ const projects = (await getCollection("projects")).sort(
     <Hashtag /> Projects
   </h1>
 
-  <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="mt-4 mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     {
       projects.map((project) => (
-          <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
+        <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
           <a href={`/projects/${slugify(project.id)}`} class="group block">
             <ProjectBanner
               title={project.data.title}
@@ -37,7 +39,10 @@ const projects = (await getCollection("projects")).sort(
                 class="text-lg font-semibold"
                 transition:name={`project-${project.id}-title`}
               >
-                <a href={`/projects/${slugify(project.id)}`} class="hover:text-primary">
+                <a
+                  href={`/projects/${slugify(project.id)}`}
+                  class="hover:text-primary"
+                >
                   {project.data.title}
                 </a>
               </h2>
@@ -55,21 +60,23 @@ const projects = (await getCollection("projects")).sort(
             <div class="flex flex-wrap items-center gap-3 text-sm">
               {project.data.repoLink ? (
                 <a
-                  class="link-underline"
+                  class="link-underline flex items-center gap-1"
                   href={project.data.repoLink}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
+                  <Github size={16} color="currentColor" />
                   Repository
                 </a>
               ) : null}
               {project.data.demoLink ? (
                 <a
-                  class="link-underline"
+                  class="link-underline flex items-center gap-1"
                   href={project.data.demoLink}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
+                  <Link size={16} color="currentColor" />
                   Live demo
                 </a>
               ) : null}
