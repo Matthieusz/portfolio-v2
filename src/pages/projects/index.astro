@@ -17,73 +17,79 @@ const projects = (await getCollection("projects")).sort(
     <Hashtag /> Projects
   </h1>
 
-  <div class="mt-4 mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    {
-      projects.map((project) => (
-        <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
-          <a href={`/projects/${slugify(project.id)}`} class="group block">
-            <ProjectBanner
-              title={project.data.title}
-              id={project.id}
-              compact={true}
-            />
-          </a>
-          <div class="flex flex-1 flex-col gap-4 p-4">
-            <div class="space-y-2">
-              <div class="text-muted-foreground text-xs">
-                <time datetime={project.data.date.toISOString()}>
-                  {project.data.date.toLocaleDateString()}
-                </time>
+  <div class="mt-4 mb-10">
+    <div class="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        projects.map((project) => (
+          <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
+            <a href={`/projects/${slugify(project.id)}`} class="group block">
+              <ProjectBanner
+                title={project.data.title}
+                id={project.id}
+                compact={true}
+              />
+            </a>
+            <div class="flex flex-1 flex-col gap-4 p-4">
+              <div class="space-y-2">
+                <div class="text-muted-foreground text-xs">
+                  <time datetime={project.data.date.toISOString()}>
+                    {project.data.date.toLocaleDateString()}
+                  </time>
+                </div>
+                <h2
+                  class="text-lg font-semibold"
+                  transition:name={`project-${project.id}-title`}
+                >
+                  <a
+                    href={`/projects/${slugify(project.id)}`}
+                    class="hover:text-primary"
+                  >
+                    {project.data.title}
+                  </a>
+                </h2>
+                <p class="text-muted-foreground text-sm">
+                  {project.data.description}
+                </p>
               </div>
-              <h2
-                class="text-lg font-semibold"
-                transition:name={`project-${project.id}-title`}
-              >
-                <a
-                  href={`/projects/${slugify(project.id)}`}
-                  class="hover:text-primary"
-                >
-                  {project.data.title}
-                </a>
-              </h2>
-              <p class="text-muted-foreground text-sm">
-                {project.data.description}
-              </p>
+              <div class="mt-auto flex flex-wrap items-center gap-2">
+                {project.data.tags.map((tag) => (
+                  <span class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div class="flex flex-wrap items-center gap-3 text-sm">
+                {project.data.repoLink ? (
+                  <a
+                    class="link-underline flex items-center gap-1"
+                    href={project.data.repoLink}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    <Github size={16} color="currentColor" />
+                    Repository
+                  </a>
+                ) : null}
+                {project.data.demoLink ? (
+                  <a
+                    class="link-underline flex items-center gap-1"
+                    href={project.data.demoLink}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    <Link size={16} color="currentColor" />
+                    Live demo
+                  </a>
+                ) : null}
+              </div>
             </div>
-            <div class="mt-auto flex flex-wrap items-center gap-2">
-              {project.data.tags.map((tag) => (
-                <span class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div class="flex flex-wrap items-center gap-3 text-sm">
-              {project.data.repoLink ? (
-                <a
-                  class="link-underline flex items-center gap-1"
-                  href={project.data.repoLink}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <Github size={16} color="currentColor" />
-                  Repository
-                </a>
-              ) : null}
-              {project.data.demoLink ? (
-                <a
-                  class="link-underline flex items-center gap-1"
-                  href={project.data.demoLink}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  <Link size={16} color="currentColor" />
-                  Live demo
-                </a>
-              ) : null}
-            </div>
-          </div>
-        </article>
-      ))
-    }
+          </article>
+        ))
+      }
+    </div>
+
+    <p class="text-muted-foreground text-md text-center">
+      + a lot of smaller less significant projects :)
+    </p>
   </div>
 </MainLayout>

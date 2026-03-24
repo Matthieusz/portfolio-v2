@@ -59,6 +59,7 @@ const CommitIcon: Component = () => (
     stroke-linejoin="round"
     class="icon icon-tabler icons-tabler-outline icon-tabler-git-commit"
   >
+    <title>Git commit icon</title>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M9 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
     <path d="M12 3l0 6" />
@@ -69,6 +70,16 @@ const CommitIcon: Component = () => (
 const EmptyState: Component<{ message: string }> = (props) => (
   <div class="text-muted-foreground flex items-center gap-3">
     <span>{props.message}</span>
+  </div>
+);
+
+const LoadingSkeleton: Component = () => (
+  <div class="flex h-full flex-col items-center justify-center gap-2">
+    <div class="bg-muted h-6 w-[90%] animate-pulse rounded" />
+    <div class="bg-muted h-6 w-[90%] animate-pulse rounded" />
+    <div class="bg-muted h-6 w-[90%] animate-pulse rounded" />
+    <div class="bg-muted h-6 w-[90%] animate-pulse rounded" />
+    <div class="bg-muted h-6 w-[90%] animate-pulse rounded" />
   </div>
 );
 
@@ -193,27 +204,24 @@ const RecentCommits: Component<RecentCommitsProps> = (props) => {
       </div>
 
       <div class="relative z-10 flex h-full flex-col gap-3">
-        <Show
-          when={!errorMessage()}
-          fallback={<EmptyState message={errorMessage() ?? ""} />}
-        >
+        <Show when={isLoading()}>
+          <LoadingSkeleton />
+        </Show>
+        <Show when={!isLoading()}>
           <Show
-            when={commits().length > 0}
-            fallback={
-              <EmptyState
-                message={
-                  isLoading()
-                    ? "Loading commits..."
-                    : "No commit data available."
-                }
-              />
-            }
+            when={!errorMessage()}
+            fallback={<EmptyState message={errorMessage() ?? ""} />}
           >
-            <div class="flex flex-col gap-3">
-              <For each={commits().slice(0, 5)}>
-                {(commit) => <CommitRow commit={commit} />}
-              </For>
-            </div>
+            <Show
+              when={commits().length > 0}
+              fallback={<EmptyState message="No commit data available." />}
+            >
+              <div class="flex flex-col gap-3">
+                <For each={commits().slice(0, 5)}>
+                  {(commit) => <CommitRow commit={commit} />}
+                </For>
+              </div>
+            </Show>
           </Show>
         </Show>
       </div>
