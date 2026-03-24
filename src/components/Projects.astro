@@ -4,6 +4,7 @@ import Github from "@/icons/Github.astro";
 import Hashtag from "@/icons/Hashtag.astro";
 import Link from "@/icons/Link.astro";
 import ProjectBanner from "@/components/ProjectBanner.astro";
+import { slugify } from "@/lib/utils";
 import { getCollection } from "astro:content";
 
 const featuredProjects = (
@@ -33,7 +34,7 @@ const featuredProjects = (
       ) : (
         featuredProjects.map((project) => (
           <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
-            <a href={`/projects/${project.id}`} class="group block">
+            <a href={`/projects/${slugify(project.id)}`} class="group block">
               <ProjectBanner
                 title={project.data.title}
                 id={project.id}
@@ -52,7 +53,7 @@ const featuredProjects = (
                   transition:name={`project-${project.id}-title`}
                 >
                   <a
-                    href={`/projects/${project.id}`}
+                    href={`/projects/${slugify(project.id)}`}
                     class="hover:text-primary"
                   >
                     {project.data.title}

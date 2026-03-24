@@ -3,19 +3,22 @@ import Github from "@/icons/Github.astro";
 import Link from "@/icons/Link.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
 import ProjectBanner from "@/components/ProjectBanner.astro";
+import { slugify } from "@/lib/utils";
 import { getCollection, getEntry, render } from "astro:content";
 
 export const getStaticPaths = async () => {
   const projects = await getCollection("projects");
 
   return projects.map((project) => ({
-    params: { slug: project.id },
+    params: { slug: slugify(project.id) },
+    props: { projectId: project.id },
   }));
 };
 
-const { slug } = Astro.params;
+const { projectId } = Astro.props;
 
-const project = await getEntry("projects", slug ?? "");
+const project =
+  typeof projectId === "string" ? await getEntry("projects", projectId) : null;
 
 if (!project) {
   return Astro.redirect("/projects");

@@ -2,6 +2,7 @@
 import Hashtag from "@/icons/Hashtag.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
 import ProjectBanner from "@/components/ProjectBanner.astro";
+import { slugify } from "@/lib/utils";
 import { getCollection } from "astro:content";
 
 const projects = (await getCollection("projects")).sort(
@@ -17,8 +18,8 @@ const projects = (await getCollection("projects")).sort(
   <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
     {
       projects.map((project) => (
-        <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
-          <a href={`/projects/${project.id}`} class="group block">
+          <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
+          <a href={`/projects/${slugify(project.id)}`} class="group block">
             <ProjectBanner
               title={project.data.title}
               id={project.id}
@@ -36,7 +37,7 @@ const projects = (await getCollection("projects")).sort(
                 class="text-lg font-semibold"
                 transition:name={`project-${project.id}-title`}
               >
-                <a href={`/projects/${project.id}`} class="hover:text-primary">
+                <a href={`/projects/${slugify(project.id)}`} class="hover:text-primary">
                   {project.data.title}
                 </a>
               </h2>
