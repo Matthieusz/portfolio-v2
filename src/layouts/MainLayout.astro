@@ -23,11 +23,11 @@ import "../styles/global.css";
       src="https://analytics.informati.dev/script.js"
       data-website-id="01439460-bd7c-4878-9778-78fd2e78c0d2"></script>
   </head>
-  <body class="min-h-screen">
+  <body class="flex min-h-screen flex-col">
     <Header transition:name="site-header" />
-    <div class="mx-auto flex max-w-[95%] flex-col md:max-w-[80%]">
+    <main class="mx-auto max-w-[95%] flex-1 md:max-w-[80%]">
       <slot />
-      <Footer transition:name="site-footer" />
-    </div>
+    </main>
+    <Footer transition:name="site-footer" />
   </body>
 </html>
