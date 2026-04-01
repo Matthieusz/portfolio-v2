@@ -1,17 +1,15 @@
 import {
-  createEffect,
+  createMemo,
   createSignal,
   For,
-  onCleanup,
+  onMount,
   Show,
+  Switch,
+  Match,
   type Component,
 } from "solid-js";
 import type { RecentCommit, RecentCommitsData } from "../lib/katib";
 import InfoTooltip from "./InfoTooltip";
-
-interface RecentCommitsProps {
-  initialData: RecentCommitsData | null;
-}
 
 const POLL_INTERVAL = 60000;
 
@@ -164,12 +162,10 @@ const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
   </div>
 );
 
-const RecentCommits: Component<RecentCommitsProps> = (props) => {
-  const [data, setData] = createSignal<RecentCommitsData | null>(
-    props.initialData,
-  );
+const RecentCommits: Component = () => {
+  const [data, setData] = createSignal<RecentCommitsData | null>(null);
   const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
-  const [isLoading, setIsLoading] = createSignal(!props.initialData);
+  const [isLoading, setIsLoading] = createSignal(true);
 
   const fetchCommits = async () => {
     try {
@@ -189,13 +185,13 @@ const RecentCommits: Component<RecentCommitsProps> = (props) => {
     }
   };
 
-  createEffect(() => {
+  onMount(() => {
     fetchCommits();
     const interval = setInterval(fetchCommits, POLL_INTERVAL);
-    onCleanup(() => clearInterval(interval));
+    return () => clearInterval(interval);
   });
 
-  const commits = () => data()?.commits ?? [];
+  const commits = createMemo(() => data()?.commits ?? []);
 
   return (
     <div class="bg-card border-border relative flex h-full flex-col gap-3 overflow-hidden rounded-lg border p-4">
@@ -214,26 +210,24 @@ const RecentCommits: Component<RecentCommitsProps> = (props) => {
       </div>
 
       <div class="relative z-10 flex h-full flex-col gap-3">
-        <Show when={isLoading()}>
-          <LoadingSkeleton />
-        </Show>
-        <Show when={!isLoading()}>
-          <Show
-            when={!errorMessage()}
-            fallback={<EmptyState message={errorMessage() ?? ""} />}
-          >
-            <Show
-              when={commits().length > 0}
-              fallback={<EmptyState message="No commit data available." />}
-            >
-              <div class="flex flex-col gap-3">
-                <For each={commits().slice(0, 5)}>
-                  {(commit) => <CommitRow commit={commit} />}
-                </For>
-              </div>
-            </Show>
-          </Show>
-        </Show>
+        <Switch>
+          <Match when={isLoading()}>
+            <LoadingSkeleton />
+          </Match>
+          <Match when={errorMessage()}>
+            <EmptyState message="Unable to load commits right now." />
+          </Match>
+          <Match when={commits().length === 0}>
+            <EmptyState message="No commit data available." />
+          </Match>
+          <Match when={commits().length > 0}>
+            <div class="flex flex-col gap-3">
+              <For each={commits().slice(0, 5)}>
+                {(commit) => <CommitRow commit={commit} />}
+              </For>
+            </div>
+          </Match>
+        </Switch>
       </div>
     </div>
   );

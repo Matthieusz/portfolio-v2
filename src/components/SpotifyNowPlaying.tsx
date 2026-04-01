@@ -1,17 +1,14 @@
 import {
   createEffect,
+  createMemo,
   createSignal,
-  onCleanup,
+  onMount,
   Show,
   type Component,
   type JSX,
 } from "solid-js";
 import type { NowPlayingData, TrackInfo } from "../lib/spotify";
 import InfoTooltip from "./InfoTooltip";
-
-interface SpotifyNowPlayingProps {
-  initialData: NowPlayingData | null;
-}
 
 const POLL_INTERVAL = 10000;
 const PROGRESS_UPDATE_INTERVAL = 1000;
@@ -158,13 +155,9 @@ const NotPlayingState: Component = () => (
   </div>
 );
 
-const SpotifyNowPlaying: Component<SpotifyNowPlayingProps> = (props) => {
-  const [data, setData] = createSignal<NowPlayingData | null>(
-    props.initialData,
-  );
-  const [localProgress, setLocalProgress] = createSignal(
-    props.initialData?.progress ?? 0,
-  );
+const SpotifyNowPlaying: Component = () => {
+  const [data, setData] = createSignal<NowPlayingData | null>(null);
+  const [localProgress, setLocalProgress] = createSignal(0);
   const [albumColor, setAlbumColor] = createSignal("var(--primary)");
   const [titleNeedsScroll, setTitleNeedsScroll] = createSignal(false);
 
@@ -183,7 +176,6 @@ const SpotifyNowPlaying: Component<SpotifyNowPlayingProps> = (props) => {
     }
   };
 
-  // Fetch now playing data
   const fetchNowPlaying = async () => {
     try {
       const response = await fetch("/api/spotify/now-playing");
@@ -197,44 +189,37 @@ const SpotifyNowPlaying: Component<SpotifyNowPlayingProps> = (props) => {
     }
   };
 
-  // Poll for updates
-  createEffect(() => {
+  onMount(() => {
     fetchNowPlaying();
     const pollInterval = setInterval(fetchNowPlaying, POLL_INTERVAL);
-    onCleanup(() => clearInterval(pollInterval));
+    return () => clearInterval(pollInterval);
   });
 
-  // Progress animation
-  createEffect(() => {
-    const currentData = data();
-    if (!currentData?.isPlaying || !currentData.duration) return;
-
+  onMount(() => {
     const progressInterval = setInterval(() => {
       const d = data();
       if (d?.isPlaying && d.duration) {
         setLocalProgress((prev) => Math.min(prev + 1000, d.duration ?? prev));
       }
     }, PROGRESS_UPDATE_INTERVAL);
-
-    onCleanup(() => clearInterval(progressInterval));
+    return () => clearInterval(progressInterval);
   });
 
-  // Check scroll on data change and window resize
+  onMount(() => {
+    window.addEventListener("resize", checkTitleScroll);
+    return () => window.removeEventListener("resize", checkTitleScroll);
+  });
+
   createEffect(() => {
     data();
-    setTimeout(checkTitleScroll, 0);
+    requestAnimationFrame(checkTitleScroll);
   });
 
-  createEffect(() => {
-    window.addEventListener("resize", checkTitleScroll);
-    onCleanup(() => window.removeEventListener("resize", checkTitleScroll));
-  });
-
-  const progressPercentage = () => {
+  const progressPercentage = createMemo(() => {
     const d = data();
     if (!d?.duration) return 0;
     return Math.min((localProgress() / d.duration) * 100, 100);
-  };
+  });
 
   const containerStyle = (): JSX.CSSProperties => ({
     "--album-color": albumColor(),

@@ -16,7 +16,7 @@ import TicTacToe from "./TicTacToe.tsx";
     class="6xl:grid-cols-5 grid grid-cols-1 items-stretch gap-4 md:grid-cols-4"
   >
     <div class="md:col-span-2">
-      <SpotifyNowPlaying client:idle initialData={null} />
+      <SpotifyNowPlaying client:idle />
     </div>
     <div class="md:col-span-2">
       <LocationMap />
@@ -29,7 +29,7 @@ import TicTacToe from "./TicTacToe.tsx";
     class="6xl:grid-cols-2 grid grid-cols-1 items-stretch gap-4 md:grid-cols-2"
   >
     <div>
-      <RecentCommits client:idle initialData={null} />
+      <RecentCommits client:idle />
     </div>
     <div>
       <RecentPosts />
