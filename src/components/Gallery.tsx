@@ -1,4 +1,10 @@
-import { createSignal, createEffect, onCleanup, Show } from "solid-js";
+import {
+  createSignal,
+  createEffect,
+  onCleanup,
+  Show,
+  type Component,
+} from "solid-js";
 import { Portal } from "solid-js/web";
 
 interface GalleryImage {
@@ -11,7 +17,7 @@ interface GalleryProps {
   images: GalleryImage[];
 }
 
-const Gallery = (props: GalleryProps) => {
+const Gallery: Component<GalleryProps> = (props) => {
   const [isOpen, setIsOpen] = createSignal(false);
   const [currentIndex, setCurrentIndex] = createSignal(0);
   const [touchStart, setTouchStart] = createSignal<number | null>(null);

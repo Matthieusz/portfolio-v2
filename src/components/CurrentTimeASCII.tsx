@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onCleanup, type Component } from "solid-js";
+import { createMemo, createSignal, onMount, type Component } from "solid-js";
 
 type TimeOfDay = "night" | "sunrise" | "noon" | "sunset";
 
@@ -104,11 +104,12 @@ const CurrentTimeASCII: Component = () => {
   const [currentTime, setCurrentTime] = createSignal(getPoznanTime());
   const [manualPeriod, setManualPeriod] = createSignal<TimeOfDay | null>(null);
 
-  const interval = setInterval(() => {
-    setCurrentTime(getPoznanTime());
-  }, 1000);
-
-  onCleanup(() => clearInterval(interval));
+  onMount(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(getPoznanTime());
+    }, 1000);
+    return () => clearInterval(interval);
+  });
 
   const currentPeriod = createMemo(() => {
     const manual = manualPeriod();
