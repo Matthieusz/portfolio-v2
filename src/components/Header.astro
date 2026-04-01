@@ -1,5 +1,28 @@
 ---
+import Download from "@/icons/Download.astro";
+import Poland from "@/icons/Poland.astro";
+import England from "@/icons/England.astro";
 import Breadcrumb from "../components/Breadcrumb.astro";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownContent,
+  DropdownItem,
+} from "../components/starwind/dropdown";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./starwind/dialog";
+import { Button } from "./starwind/button";
+
+const cvEnglishUrl = "/cv/cv-en.pdf";
+const cvPolishUrl = "/cv/cv-pl.pdf";
 ---
 
 <header id="site-header" class="sticky top-0 z-2000 backdrop-blur-sm">
@@ -34,67 +57,94 @@ import Breadcrumb from "../components/Breadcrumb.astro";
       >
         Blog
       </a>
+      <Dialog>
+        <DialogTrigger
+          asChild
+          class="hover:text-primary cursor-pointer rounded px-3 py-2 font-medium transition-colors duration-250"
+        >
+          <p class="flex items-center gap-2"><Download /> CV</p>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Download résumé</DialogTitle>
+            <DialogDescription> Pick a language </DialogDescription>
+          </DialogHeader>
+          <div class="flex justify-center gap-4 py-4">
+            <Button variant="ghost" size="lg" href={cvPolishUrl} download
+              ><Poland /> PL
+            </Button>
+            <Button variant="ghost" size="lg" href={cvEnglishUrl} download
+              ><England /> EN
+            </Button>
+          </div>
+          <DialogFooter>
+            <p class="text-muted-foreground text-sm">
+              Built using <a
+                href="https://rxresu.me/"
+                target="_blank"
+                class="text-primary">Reactive Resume</a
+              >, an awesome open-source resume builder.
+            </p>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </nav>
 
     <!-- Mobile hamburger menu -->
-    <details class="relative md:hidden">
-      <summary
-        class="hover:bg-primary/10 flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-md transition-colors select-none"
-        aria-label="Open menu"
-      >
-        <span class="sr-only">Open menu</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="h-5 w-5"
-          aria-hidden="true"
+    <div class="relative md:hidden">
+      <Dropdown>
+        <DropdownTrigger
+          class="hover:bg-primary/10 hover:text-primary flex h-10 w-10 cursor-pointer items-center justify-center rounded-md transition-colors"
+          aria-label="Open menu"
         >
-          <line x1="4" y1="6" x2="20" y2="6"></line>
-          <line x1="4" y1="12" x2="20" y2="12"></line>
-          <line x1="4" y1="18" x2="20" y2="18"></line>
-        </svg>
-      </summary>
-
-      <nav
-        class="border-border bg-background absolute right-0 mt-3 w-44 rounded-md border p-2 shadow-lg"
-        aria-label="Mobile"
-      >
-        <a
-          href="/"
-          class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
-        >
-          Home
-        </a>
-        <a
-          href="/about"
-          class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
-        >
-          About
-        </a>
-        <a
-          href="/projects"
-          class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
-        >
-          Projects
-        </a>
-        <a
-          href="/blog"
-          class="hover:bg-primary/10 hover:text-primary block rounded px-3 py-2 font-medium transition-colors duration-250"
-        >
-          Blog
-        </a>
-      </nav>
-    </details>
+          <span class="sr-only">Open menu</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-5 w-5"
+            aria-hidden="true"
+          >
+            <line x1="4" y1="6" x2="20" y2="6"></line>
+            <line x1="4" y1="12" x2="20" y2="12"></line>
+            <line x1="4" y1="18" x2="20" y2="18"></line>
+          </svg>
+        </DropdownTrigger>
+        <DropdownContent align="end">
+          <DropdownItem as="a" href="/">Home</DropdownItem>
+          <DropdownItem as="a" href="/about">About</DropdownItem>
+          <DropdownItem as="a" href="/projects">Projects</DropdownItem>
+          <DropdownItem as="a" href="/blog">Blog</DropdownItem>
+          <Dialog>
+            <DialogTrigger
+              asChild
+              class="hover:text-primary cursor-pointer rounded px-3 py-2 font-medium transition-colors duration-250"
+            >
+              <p class="flex items-center gap-2"><Download /> CV</p>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Example Dialog</DialogTitle>
+                <DialogDescription>
+                  This is a simple dialog example that demonstrates the basic
+                  functionality.
+                </DialogDescription>
+              </DialogHeader>
+              <div class="py-4">Your dialog content goes here.</div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button>Save Changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </DropdownContent>
+      </Dropdown>
+    </div>
   </div>
 </header>
-
-<style>
-  summary::-webkit-details-marker {
-    display: none;
-  }
-</style>
