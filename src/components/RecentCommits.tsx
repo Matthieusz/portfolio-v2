@@ -74,12 +74,22 @@ const EmptyState: Component<{ message: string }> = (props) => (
 );
 
 const LoadingSkeleton: Component = () => (
-  <div class="flex h-full flex-col items-center justify-center gap-2">
-    <div class="bg-muted h-6 w-[90%] animate-pulse rounded" />
-    <div class="bg-muted h-6 w-[90%] animate-pulse rounded" />
-    <div class="bg-muted h-6 w-[90%] animate-pulse rounded" />
-    <div class="bg-muted h-6 w-[90%] animate-pulse rounded" />
-    <div class="bg-muted h-6 w-[90%] animate-pulse rounded" />
+  <div class="flex h-full flex-col justify-center gap-3">
+    {[0, 1, 2, 3, 4].map(() => (
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between">
+          <div class="bg-muted animate-shimmer h-3 w-20 rounded" />
+          <div class="flex items-center gap-1.5">
+            <div class="bg-muted animate-shimmer h-3 w-14 rounded" />
+            <div class="bg-muted animate-shimmer h-3 w-10 rounded" />
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
+          <div class="bg-muted animate-shimmer h-4 w-3/4 rounded" />
+          <div class="bg-muted animate-shimmer h-3 w-16 rounded" />
+        </div>
+      </div>
+    ))}
   </div>
 );
 
