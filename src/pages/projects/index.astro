@@ -22,7 +22,10 @@ const projects = (await getCollection("projects")).sort(
       {
         projects.map((project) => (
           <article class="bg-card border-border flex h-full flex-col overflow-hidden rounded-lg border">
-            <a href={`/projects/${slugify(project.id)}`} class="group block">
+            <a
+              href={`/projects/${slugify(project.data.title)}`}
+              class="group block"
+            >
               <ProjectBanner
                 title={project.data.title}
                 id={project.id}
@@ -41,7 +44,7 @@ const projects = (await getCollection("projects")).sort(
                   transition:name={`project-${project.id}-title`}
                 >
                   <a
-                    href={`/projects/${slugify(project.id)}`}
+                    href={`/projects/${slugify(project.data.title)}`}
                     class="hover:text-primary"
                   >
                     {project.data.title}
