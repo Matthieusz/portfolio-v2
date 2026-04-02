@@ -1,65 +1,56 @@
 ---
 title: Squad Builder
-description: Labsync is a web application supporting organization and communication in laboratory groups
+description: A local-first team builder tool for Margonem MMORPG players to create, manage, and share squad compositions
 date: 2025-10-02
 tags:
-  - convex
-  - typescript
-  - tanstack-start
-  - react
+  - svelte
+  - svelte-kit
+  - local-first
   - SPA
-  - RBAC
+  - typescript
   - tailwindcss
-  - docker
+  - bun
+  - monorepo
+
 featured: false
 repoLink: https://github.com/Matthieusz/squad-builder
 demoLink: https://squad-builder.informati.dev
 ---
 
-**Labsync** is a comprehensive web application designed to help students organize their work and communication within university laboratory groups. It bridges the gap between casual social platforms and rigid educational management systems, offering a solution tailored specifically for student self-organization.
+**Squad Builder** is a web application designed for players of the MMORPG Margonem to create, organize, and share team compositions. It provides a streamlined interface for importing character data, grouping squads, and exporting configurations for easy sharing with other players.
 
 ## The Problem
 
-Managing laboratory coursework requires constant coordination: scheduling exams, sharing experimental data, and communicating progress. Students typically resort to a fragmented set of tools to handle this:
+Margonem players who engage in group content need to coordinate team compositions, but there's no dedicated tool for planning and sharing squad setups. Players typically rely on:
 
-- **Discord/Slack** for chat, which lacks academic context or structured calendars.
-- **Google Drive/Classroom** for files, which can be disconnected from daily communication.
-- **Trello/Notion** for tasks, which often requires significant manual setup.
+- **Manual notes** or spreadsheets, which are cumbersome to maintain and share.
+- **Memory**, which is unreliable for complex multi-character team planning.
 
-This fragmentation leads to missed deadlines and disorganized resources. Labsync solves this by centralizing these functions into one "set-and-forget" platform.
+This makes it difficult to experiment with different team compositions or share builds with teammates.
 
 ## The Solution
 
-Labsync is a dedicated platform where users can create **Organizations** (representing entire lab groups) and **Teams** (smaller project subgroups). It provides a unified interface for:
+Squad Builder is a dedicated platform where players can:
 
-- **Real-Time Communication:** A built-in chat system that supports instant messaging across groups and subgroups.
-- **Academic Calendar:** A specialized calendar to track exams, colloquiums, and project deadlines.
-- **File Management:** A drag-and-drop file repository that automatically categorizes uploads by MIME type (e.g., separating code, documentation, and media).
-- **Hierarchical Structure:** A robust system of Organizations and Teams, secured by invite codes and passwords.
-- **Role-Based Access Control (RBAC):** Granular permissions for Owners, Administrators, and Members to manage content and users effectively.
+- **Import Characters:** Add character accounts by importing data from Margonem profile pages.
+- **Create Squad Groups:** Organize multiple squads into logical groups for different purposes (e.g., PvP, raids, dungeons).
+- **Export & Import:** Share squad configurations with others through export/import functionality.
+- **Local-First Storage:** All data is stored locally in the browser, ensuring privacy and instant access without requiring account registration.
 
 ## Tech Stack & Architecture
 
-The application is built on a modern, type-safe stack designed for performance, scalability, and developer experience.
+The application is built as a modern monorepo with a focus on developer experience and performance.
 
-### Backend-as-a-Service (Convex)
+### Monorepo Structure
 
-Labsync utilizes **Convex** as its backend platform, which provides:
+- **Turborepo:** Manages the monorepo build system for optimized development and builds.
+- **Bun:** Used as the package manager and runtime for fast dependency management.
 
-- **Reactive Data:** The UI updates automatically in real-time without the need for manual WebSocket implementation.
-- **Serverless Functions:** Logic is separated into _Queries_ (read-only) and _Mutations_ (transactional updates).
-- **End-to-End Type Safety:** Data schemas are strictly typed, ensuring consistency between the database and the frontend.
+### Frontend
 
-### Frontend Ecosystem
+The UI is built with **SvelteKit** and modern tooling:
 
-The user interface is constructed using **React 19** and the **TanStack** suite:
-
-- **TanStack Start & Nitro:** Handles Server-Side Rendering (SSR) to ensure fast initial load times.
-- **TanStack Query:** Manages asynchronous state and integrates seamlessly with Convex.
-- **TanStack Router:** Provides type-safe routing across the application.
-- **Styling:** Built with **TailwindCSS** and **ShadCN UI**, featuring a responsive dark-mode design.
-
-### Security & Quality
-
-- **Authentication:** Integrated via **Better Auth**, supporting secure sessions and password hashing.
-- **Testing:** The codebase is covered by over 260 automated tests (Unit, Integration, and Acceptance) using **Vitest** and **Testing Library**, achieving high reliability.
+- **SvelteKit:** Provides the framework for the web application with file-based routing and SSR capabilities.
+- **TypeScript:** Ensures type safety across the entire codebase.
+- **TailwindCSS:** Utility-first CSS framework for rapid, consistent UI development.
+- **Svelte Stores:** Local state management for a responsive, local-first user experience.
