@@ -1,7 +1,7 @@
 ---
 title: Squad Builder
 description: A local-first team builder tool for Margonem MMORPG players to create, manage, and share squad compositions
-date: 2025-10-02
+date: 2026-03-16
 tags:
   - svelte
   - svelte-kit
