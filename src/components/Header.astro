@@ -128,18 +128,25 @@ const cvPolishUrl = "/cv/cv-pl.pdf";
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Example Dialog</DialogTitle>
-                <DialogDescription>
-                  This is a simple dialog example that demonstrates the basic
-                  functionality.
-                </DialogDescription>
+                <DialogTitle>Download résumé</DialogTitle>
+                <DialogDescription> Pick a language </DialogDescription>
               </DialogHeader>
-              <div class="py-4">Your dialog content goes here.</div>
+              <div class="flex justify-center gap-4 py-4">
+                <Button variant="ghost" size="lg" href={cvPolishUrl} download
+                  ><Poland /> PL
+                </Button>
+                <Button variant="ghost" size="lg" href={cvEnglishUrl} download
+                  ><England /> EN
+                </Button>
+              </div>
               <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DialogClose>
-                <Button>Save Changes</Button>
+                <p class="text-muted-foreground text-sm">
+                  Built using <a
+                    href="https://rxresu.me/"
+                    target="_blank"
+                    class="text-primary">Reactive Resume</a
+                  >, an awesome open-source resume builder.
+                </p>
               </DialogFooter>
             </DialogContent>
           </Dialog>
