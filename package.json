@@ -12,6 +12,7 @@
   "dependencies": {
     "@astrojs/check": "0.9.7",
     "@astrojs/node": "10.0.0",
+    "@astrojs/sitemap": "^3.7.2",
     "@astrojs/solid-js": "6.0.0",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@tabler/icons": "^3",
