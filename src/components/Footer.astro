@@ -10,47 +10,43 @@ const currentYear = new Date().getFullYear();
   class="border-border mx-auto mt-auto w-full max-w-[95%] border-t py-4 text-sm md:max-w-[80%]"
 >
   <div class="flex flex-col items-center justify-between gap-4 md:flex-row">
-    <!-- Left side: Copyright & Status -->
+    <!-- Left: copyright · status · location -->
     <div class="flex flex-col items-center gap-2 md:flex-row">
-      <div>
-        <span>© {currentYear} Mateusz Irski</span>
-      </div>
-      <span class="text-muted-foreground/50 hidden md:block">-</span>
-      <div>
-        <span class="text-muted-foreground flex items-center gap-2">
-          <span class="relative flex size-2">
-            <span
-              class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"
-            ></span>
-            <span class="relative inline-flex size-2 rounded-full bg-green-500"
-            ></span>
-          </span>
-          <a
-            href="https://uptime.informati.dev/status/overview"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="hover:text-foreground transition-colors"
-          >
-            All Services Nominal
-          </a>
+      <span>© {currentYear} Mateusz Irski</span>
+      <span class="text-muted-foreground/70 hidden md:block" aria-hidden="true">-</span>
+      <span class="text-muted-foreground flex items-center gap-2">
+        <span class="relative flex size-2">
+          <span
+            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"
+          ></span>
+          <span class="relative inline-flex size-2 rounded-full bg-green-500"
+          ></span>
         </span>
-      </div>
+        <a
+          href="https://uptime.informati.dev/status/overview"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:text-foreground transition-colors"
+        >
+          All services nominal
+        </a>
+      </span>
+      <span class="text-muted-foreground/70 hidden md:block" aria-hidden="true">·</span>
+      <span class="text-muted-foreground">Poznań, PL</span>
     </div>
 
-    <!-- Right side: Time, Social Links -->
+    <!-- Right: time on site + social -->
     <div class="flex items-center gap-3">
-      <!-- Time on Site -->
       <span
         class="text-muted-foreground flex items-center gap-2 tabular-nums"
         title="Time spent looking through my site"
       >
-        <Hourglass size={16} color="var(--muted-foreground)" />
+        <Hourglass size={16} color="currentColor" />
         <span id="footer-time">00:00:00</span>
       </span>
 
-      <span class="text-muted-foreground/50">-</span>
+      <span class="text-muted-foreground/70" aria-hidden="true">-</span>
 
-      <!-- Social Links -->
       <div class="flex items-center gap-2">
         <a
           href="https://github.com/Matthieusz"
@@ -59,7 +55,7 @@ const currentYear = new Date().getFullYear();
           class="hover:text-foreground transition-colors"
           aria-label="GitHub"
         >
-          <Github size={20} color="var(--foreground)" />
+          <Github size={20} color="currentColor" />
         </a>
         <a
           href="https://www.linkedin.com/in/mateusz-irski-61a593248/"
@@ -68,7 +64,7 @@ const currentYear = new Date().getFullYear();
           class="hover:text-foreground transition-colors"
           aria-label="LinkedIn"
         >
-          <Linkedin size={20} color="var(--foreground)" />
+          <Linkedin size={20} color="currentColor" />
         </a>
       </div>
     </div>

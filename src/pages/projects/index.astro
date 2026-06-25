@@ -1,5 +1,4 @@
 ---
-import Hashtag from "@/icons/Hashtag.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
 import ProjectBanner from "@/components/ProjectBanner.astro";
 import { slugify } from "@/lib/utils";
@@ -13,8 +12,11 @@ const projects = (await getCollection("projects")).sort(
 ---
 
 <MainLayout>
-  <h1 class="mt-12 mb-6 flex items-center gap-2 text-3xl font-bold md:text-4xl">
-    <Hashtag /> Projects
+  <h1
+    class="section-keyline mt-12 mb-6 text-4xl font-bold tracking-[-0.02em]"
+    style="text-wrap: balance;"
+  >
+    Projects
   </h1>
 
   <div class="mt-4 mb-12">
@@ -36,7 +38,7 @@ const projects = (await getCollection("projects")).sort(
               <div class="space-y-2">
                 <div class="text-muted-foreground text-xs">
                   <time datetime={project.data.date.toISOString()}>
-                    {project.data.date.toLocaleDateString()}
+                    {project.data.date.toLocaleDateString("en-GB")}
                   </time>
                 </div>
                 <h2
@@ -45,21 +47,17 @@ const projects = (await getCollection("projects")).sort(
                 >
                   <a
                     href={`/projects/${slugify(project.data.title)}`}
-                    class="hover:text-primary"
+                    class="hover:text-primary transition-colors"
                   >
                     {project.data.title}
                   </a>
                 </h2>
-                <p class="text-muted-foreground text-sm">
+                <p class="text-muted-foreground text-sm leading-relaxed">
                   {project.data.description}
                 </p>
               </div>
-              <div class="mt-auto flex flex-wrap items-center gap-2">
-                {project.data.tags.map((tag) => (
-                  <span class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs">
-                    {tag}
-                  </span>
-                ))}
+              <div class="text-muted-foreground mt-auto text-xs leading-relaxed">
+                {project.data.tags.join(" · ")}
               </div>
               <div class="flex flex-wrap items-center gap-3 text-sm">
                 {project.data.repoLink ? (

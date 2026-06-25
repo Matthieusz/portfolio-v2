@@ -1,0 +1,118 @@
+---
+import ArrowRight from "@/icons/ArrowRight.astro";
+import Github from "@/icons/Github.astro";
+import Link from "@/icons/Link.astro";
+import ProjectBanner from "@/components/ProjectBanner.astro";
+import { slugify } from "@/lib/utils";
+import { getCollection } from "astro:content";
+
+const featured = (
+  await getCollection("projects", ({ data }) => data.featured)
+).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Lead = the project I'm most proud of and that's currently in production use.
+const lead =
+  featured.find((p) => p.id.toLowerCase().startsWith("tepirek")) ?? featured[0];
+
+const supporting = lead ? featured.filter((p) => p.id !== lead.id) : [];
+---
+
+<div class="mt-8 flex flex-col gap-10">
+  {
+    lead && (
+      <article class="border-border grid gap-6 overflow-hidden rounded-lg border md:grid-cols-2">
+        <a
+          href={`/projects/${slugify(lead.data.title)}`}
+          class="group block"
+          aria-label={lead.data.title}
+        >
+          <ProjectBanner
+            title={lead.data.title}
+            id={lead.id}
+            compact={false}
+          />
+        </a>
+        <div class="flex flex-col gap-4 p-5 md:p-6">
+          <div class="text-muted-foreground text-xs uppercase tracking-wider">
+            Lead · In production
+          </div>
+          <h3
+            class="text-2xl font-bold tracking-[-0.02em]"
+            transition:name={`project-${lead.id}-title`}
+          >
+            <a href={`/projects/${slugify(lead.data.title)}`} class="hover:text-primary transition-colors">
+              {lead.data.title}
+            </a>
+          </h3>
+          <p class="text-muted-foreground text-sm leading-relaxed md:text-base">
+            {lead.data.description}
+          </p>
+          <div class="text-muted-foreground text-xs leading-relaxed">
+            {lead.data.tags.join(" · ")}
+          </div>
+          <div class="mt-auto flex flex-wrap items-center gap-4 text-sm">
+            {lead.data.repoLink && (
+              <a
+                class="hover:text-primary flex items-center gap-2 transition-colors"
+                href={lead.data.repoLink}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Github size={16} color="currentColor" /> Repository
+              </a>
+            )}
+            {lead.data.demoLink && (
+              <a
+                class="hover:text-primary flex items-center gap-2 transition-colors"
+                href={lead.data.demoLink}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Link size={16} color="currentColor" /> Live demo
+              </a>
+            )}
+          </div>
+        </div>
+      </article>
+    )
+  }
+
+  <ul class="flex flex-col">
+    {
+      supporting.map((project) => (
+        <li class="border-border border-t">
+          <a
+            href={`/projects/${slugify(project.data.title)}`}
+            class="group flex flex-col gap-1 py-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
+          >
+            <div class="flex items-baseline gap-3">
+              <span class="text-muted-foreground text-xs tabular-nums">
+                {project.data.date.toLocaleDateString("en-GB")}
+              </span>
+              <h3 class="text-lg font-semibold">
+                <span class="hover:text-primary transition-colors">
+                  {project.data.title}
+                </span>
+              </h3>
+            </div>
+            <div class="text-muted-foreground flex items-center gap-3 text-xs">
+              <span class="truncate sm:max-w-[20rem]">{project.data.description}</span>
+              <ArrowRight
+                size={16}
+                color="currentColor"
+                class="shrink-0 transition-transform group-hover:translate-x-1"
+              />
+            </div>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <a
+    href="/projects"
+    class="text-muted-foreground hover:text-primary inline-flex items-center gap-1 text-sm transition-colors"
+  >
+    View every project <ArrowRight size={16} color="currentColor" />
+  </a>
+</div>

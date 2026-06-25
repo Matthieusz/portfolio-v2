@@ -80,19 +80,21 @@ const hasImages = imageEntries.length > 0;
   <article class="mx-auto mb-12 max-w-4xl overflow-hidden rounded-lg">
     <ProjectBanner title={title} id={project.id} compact={false} />
     <div class="p-6">
-      <header class="mb-6 space-y-3">
+      <header class="mb-8 space-y-4">
         <h1
-          class="text-3xl font-bold"
+          class="section-keyline text-3xl font-bold tracking-[-0.02em] md:text-4xl"
           transition:name={`project-${project.id}-title`}
         >
           {title}
         </h1>
-        <div class="flex flex-wrap items-center gap-3 text-sm">
-          <time datetime={date.toISOString()}>{date.toLocaleDateString()}</time>
+        <div class="text-muted-foreground flex flex-wrap items-center gap-3 text-sm">
+          <time class="tabular-nums" datetime={date.toISOString()}
+            >{date.toLocaleDateString("en-GB")}</time
+          >
           {
             repoLink ? (
               <a
-                class="link-underline flex items-center gap-1"
+                class="hover:text-primary flex items-center gap-1 transition-colors"
                 href={repoLink}
                 rel="noopener noreferrer"
                 target="_blank"
@@ -105,7 +107,7 @@ const hasImages = imageEntries.length > 0;
           {
             demoLink ? (
               <a
-                class="link-underline flex items-center gap-1"
+                class="hover:text-primary flex items-center gap-1 transition-colors"
                 href={demoLink}
                 rel="noopener noreferrer"
                 target="_blank"
@@ -117,14 +119,8 @@ const hasImages = imageEntries.length > 0;
           }
           {hasImages && <Gallery images={imageEntries} client:load />}
         </div>
-        <div class="flex flex-wrap gap-2">
-          {
-            tags.map((tag) => (
-              <span class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs">
-                {tag}
-              </span>
-            ))
-          }
+        <div class="text-muted-foreground text-sm">
+          {tags.join(" · ")}
         </div>
       </header>
 
