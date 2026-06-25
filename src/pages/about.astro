@@ -1,5 +1,4 @@
 ---
-import Hashtag from "@/icons/Hashtag.astro";
 import Github from "@/icons/Github.astro";
 import Linkedin from "@/icons/Linkedin.astro";
 import Mail from "@/icons/Mail.astro";
@@ -24,16 +23,25 @@ const socialLinks = [
 ---
 
 <MainLayout>
-  <section class="mx-auto my-12 flex max-w-6xl flex-col items-start gap-4">
-    <h1 class="flex items-center gap-2 text-4xl font-bold">
-      <Hashtag /> About Me
+  <section class="mx-auto my-12 flex max-w-6xl flex-col items-start gap-8">
+    <h1
+      class="section-keyline text-4xl font-bold tracking-[-0.02em]"
+      style="text-wrap: balance;"
+    >
+      About me
     </h1>
-    <div class="flex w-full flex-col gap-4 md:flex-row">
+    <div class="flex w-full flex-col gap-6 md:flex-row md:gap-10">
       <div class="mx-auto md:w-[40%]">
-        <Image src={AboutMePic} alt="Mateusz Irski" width={400} height={400} />
+        <Image
+          src={AboutMePic}
+          alt="Mateusz Irski"
+          width={400}
+          height={400}
+          class="rounded-lg"
+        />
       </div>
       <div class="md:w-[60%]">
-        <p class="text-lg">
+        <p class="text-lg leading-relaxed">
           Hi! I'm Mateusz, a software developer with a passion for creating
           innovative solutions. I have experience mainly in Typescript and
           various frameworks (recently loving Tanstack Start though), and I
@@ -44,9 +52,9 @@ const socialLinks = [
       </div>
     </div>
 
-    <div class="mt-8 w-full">
+    <div class="mt-4 w-full">
       <h2
-        class="text-muted-foreground mb-4 text-sm font-medium tracking-wider uppercase"
+        class="section-keyline mb-6 text-2xl font-bold tracking-[-0.02em]"
       >
         Connect with me
       </h2>
@@ -57,7 +65,7 @@ const socialLinks = [
               href={social.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="bg-card border-border group hover:border-primary/50 flex items-center gap-4 rounded-lg border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+              class="border-border hover:border-primary group flex items-center gap-4 rounded-lg border p-4 transition-colors"
             >
               <div class="bg-muted group-hover:bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg transition-colors">
                 <social.icon size={24} color="currentColor" />
@@ -74,12 +82,12 @@ const socialLinks = [
       </div>
 
       <div
-        class="mt-6 flex flex-col items-center justify-center gap-2 text-sm sm:flex-row"
+        class="mt-8 flex flex-col items-center justify-center gap-2 text-sm sm:flex-row"
       >
         <span class="text-muted-foreground">or send me an email at</span>
         <a
           href="mailto:mateusz.irski@gmail.com"
-          class="link-underline group text-foreground hover:text-primary inline-flex items-center gap-1 font-medium transition-colors"
+          class="link-underline text-foreground group inline-flex items-center gap-1 font-medium"
         >
           <Mail size={16} color="currentColor" />
           <span>mateusz.irski@gmail.com</span>

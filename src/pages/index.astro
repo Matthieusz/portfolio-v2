@@ -1,27 +1,32 @@
 ---
-import CurrentTimeASCII from "@/components/CurrentTimeASCII.tsx";
 import Hero from "@/components/Hero.astro";
-import Miscellaneous from "@/components/Miscellaneous.astro";
-import Projects from "@/components/Projects.astro";
+import LiveFeed from "@/components/LiveFeed.tsx";
+import FeaturedWork from "@/components/FeaturedWork.astro";
+import Writing from "@/components/Writing.astro";
 import MainLayout from "@/layouts/MainLayout.astro";
 ---
 
 <MainLayout>
-  <main class="mt-12">
+  <main class="mt-8 md:mt-12">
     <div class="mx-auto max-w-6xl">
       <section
-        class="6xl:flex-row 6xl:items-baseline mt-12 flex flex-col items-center justify-between gap-16"
+        class="flex flex-col items-center gap-10 6xl:flex-row 6xl:items-start 6xl:justify-between 6xl:gap-16"
       >
         <Hero />
-        <CurrentTimeASCII client:idle />
+        <div class="w-full max-w-md 6xl:w-[34rem]">
+          <LiveFeed client:idle />
+        </div>
       </section>
 
-      <section class="mt-16">
-        <Projects />
+      <section class="mt-20 md:mt-28">
+        <h2 class="section-keyline text-3xl font-bold tracking-[-0.02em] md:text-4xl">
+          Featured work
+        </h2>
+        <FeaturedWork />
       </section>
 
-      <section class="mt-12 mb-12">
-        <Miscellaneous />
+      <section class="mt-20 mb-16 md:mt-28">
+        <Writing />
       </section>
     </div>
   </main>
