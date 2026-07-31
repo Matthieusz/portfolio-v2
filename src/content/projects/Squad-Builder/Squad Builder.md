@@ -1,6 +1,6 @@
 ---
 title: Squad Builder
-description: A local-first team builder tool for Margonem MMORPG players to create, manage, and share squad compositions
+description: Plan and share Margonem squads without accounts, servers, or spreadsheets.
 date: 2026-03-16
 tags:
   - svelte
@@ -17,40 +17,20 @@ repoLink: https://github.com/Matthieusz/squad-builder
 demoLink: https://squad-builder.informati.dev
 ---
 
-**Squad Builder** is a web application designed for players of the MMORPG Margonem to create, organize, and share team compositions. It provides a streamlined interface for importing character data, grouping squads, and exporting configurations for easy sharing with other players.
+Squad Builder is a quick way to plan Margonem teams and pass them around. No account, no backend, no spreadsheet gymnastics.
 
-## The Problem
+## Why
 
-Margonem players who engage in group content need to coordinate team compositions, but there's no dedicated tool for planning and sharing squad setups. Players typically rely on:
+Planning one squad from memory is fine. Planning several across different accounts is not. I wanted a tool made for that exact job, without turning it into another service players have to sign up for.
 
-- **Manual notes** or spreadsheets, which are cumbersome to maintain and share.
-- **Memory**, which is unreliable for complex multi-character team planning.
+## What it does
 
-This makes it difficult to experiment with different team compositions or share builds with teammates.
+- Imports characters straight from Margonem profile pages.
+- Groups squads for PvP, raids, dungeons, or whatever else you are planning.
+- Exports the whole setup so another player can import it in a few clicks.
 
-## The Solution
+Everything stays in the browser. That keeps the app fast, private, and usable without an internet-backed account.
 
-Squad Builder is a dedicated platform where players can:
+## How it's built
 
-- **Import Characters:** Add character accounts by importing data from Margonem profile pages.
-- **Create Squad Groups:** Organize multiple squads into logical groups for different purposes (e.g., PvP, raids, dungeons).
-- **Export & Import:** Share squad configurations with others through export/import functionality.
-- **Local-First Storage:** All data is stored locally in the browser, ensuring privacy and instant access without requiring account registration.
-
-## Tech Stack & Architecture
-
-The application is built as a modern monorepo with a focus on developer experience and performance.
-
-### Monorepo Structure
-
-- **Turborepo:** Manages the monorepo build system for optimized development and builds.
-- **Bun:** Used as the package manager and runtime for fast dependency management.
-
-### Frontend
-
-The UI is built with **SvelteKit** and modern tooling:
-
-- **SvelteKit:** Provides the framework for the web application with file-based routing and SSR capabilities.
-- **TypeScript:** Ensures type safety across the entire codebase.
-- **TailwindCSS:** Utility-first CSS framework for rapid, consistent UI development.
-- **Svelte Stores:** Local state management for a responsive, local-first user experience.
+The UI is built with **SvelteKit**, **TypeScript**, and **Tailwind CSS**. Browser storage holds the data, while import and export turn a local setup into something shareable. The repo uses **Bun** and **Turborepo**, but the product itself stays deliberately small: open it, build a squad, send it.

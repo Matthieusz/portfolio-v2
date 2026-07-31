@@ -1,6 +1,6 @@
 ---
 title: Tepirek Revamped
-description: Tepirek Revamped is an app designed for Margonem as a clan management tool
+description: "Clan ops for Margonem: squads, events, auctions, bets, and everything in between."
 date: 2025-08-04
 tags:
   - typescript
@@ -16,20 +16,20 @@ repoLink: https://github.com/Matthieusz/tepirek-revamped
 demoLink: https://gz.informati.dev
 ---
 
-**Tepirek Revamped** is a comprehensive clan management dashboard designed for the MMORPG _Margonem_. Built as a modern web application, it streamlines coordination for clan members by providing tools for squad organization, character tracking, and event management.
+Tepirek Revamped is the control room for a Margonem clan. It replaces the spreadsheet-and-chat-thread combo with tools shaped around how the game is actually played.
 
-## Key Features
+## Why
 
-- **Margonem Integration**: Automatically parses and imports game account data (characters, professions, levels) from official profiles.
-- **Squad Builder**: Advanced tools for organizing team compositions and managing shared account access for clan activities.
-- **Event & Auction Management**: Systems for scheduling clan events, managing auction signups, and distributing loot or gold.
-- **Hero Betting System**: A specialized module for tracking and betting on in-game "Hero" (boss) entities tied to events.
-- **Hub Functionality**: Centralized announcements, ranking lists, and player directories to keep the clan connected.
+Clan logistics get messy fast. Events, shared accounts, auctions, hero bets, and player data all follow different rules, yet they need to stay in sync. This project brings that work into one purpose-built app.
 
-## Tech Stack
+## What it does
 
-- **Frontend**: React, TanStack Start, TanStack Query, Tailwind CSS, shadcn/ui
-- **Backend**: Hono (Node.js), oRPC (for end-to-end type safety)
-- **Database**: PostgreSQL with Drizzle ORM
-- **Architecture**: Monorepo (pnpm + Turborepo), Dockerized deployment
-- **Authentication**: Better Auth with secure session management
+- Imports Margonem characters, professions, and levels from official profiles.
+- Handles squads, account access, events, auctions, loot, and gold distribution.
+- Tracks hero bets, rankings, announcements, skills, and player verification.
+
+It is less of a generic dashboard and more of a custom toolkit for the jobs a clan repeats every week.
+
+## How it's built
+
+The frontend runs on **React** and **TanStack Start**. A **Bun** and **Hono** server talks to **PostgreSQL** through **Drizzle**, with shared **Effect** contracts keeping the API typed end to end. **Better Auth** covers password and Discord sign-in, including admin approval for new members.

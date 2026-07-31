@@ -1,6 +1,6 @@
 ---
 title: Labsync
-description: Labsync is a web application supporting organization and communication in laboratory groups
+description: One shared space for lab groups to chat, plan deadlines, and keep files in order.
 date: 2025-10-02
 tags:
   - convex
@@ -16,50 +16,20 @@ repoLink: https://github.com/Matthieusz/labsync
 demoLink: https://labsync.informati.dev
 ---
 
-**Labsync** is a comprehensive web application designed to help students organize their work and communication within university laboratory groups. It bridges the gap between casual social platforms and rigid educational management systems, offering a solution tailored specifically for student self-organization.
+Labsync puts the moving parts of a university lab group in one place: messages, dates, files, and people.
 
-## The Problem
+## Why
 
-Managing laboratory coursework requires constant coordination: scheduling exams, sharing experimental data, and communicating progress. Students typically resort to a fragmented set of tools to handle this:
+Lab work usually ends up scattered across Discord, Drive, a calendar, and someone else's Notion board. Each tool works, but the group still has to remember where everything lives. I built Labsync to cut out that shuffle.
 
-- **Discord/Slack** for chat, which lacks academic context or structured calendars.
-- **Google Drive/Classroom** for files, which can be disconnected from daily communication.
-- **Trello/Notion** for tasks, which often requires significant manual setup.
+## What it does
 
-This fragmentation leads to missed deadlines and disorganized resources. Labsync solves this by centralizing these functions into one "set-and-forget" platform.
+- Splits a lab group into organizations and smaller project teams.
+- Keeps chat, exams, colloquiums, and deadlines together.
+- Sorts uploaded files by type and gives owners, admins, and members the right level of access.
 
-## The Solution
+Groups can stay private with invite codes and passwords, so setup is quick without giving up control.
 
-Labsync is a dedicated platform where users can create **Organizations** (representing entire lab groups) and **Teams** (smaller project subgroups). It provides a unified interface for:
+## How it's built
 
-- **Real-Time Communication:** A built-in chat system that supports instant messaging across groups and subgroups.
-- **Academic Calendar:** A specialized calendar to track exams, colloquiums, and project deadlines.
-- **File Management:** A drag-and-drop file repository that automatically categorizes uploads by MIME type (e.g., separating code, documentation, and media).
-- **Hierarchical Structure:** A robust system of Organizations and Teams, secured by invite codes and passwords.
-- **Role-Based Access Control (RBAC):** Granular permissions for Owners, Administrators, and Members to manage content and users effectively.
-
-## Tech Stack & Architecture
-
-The application is built on a modern, type-safe stack designed for performance, scalability, and developer experience.
-
-### Backend-as-a-Service (Convex)
-
-Labsync utilizes **Convex** as its backend platform, which provides:
-
-- **Reactive Data:** The UI updates automatically in real-time without the need for manual WebSocket implementation.
-- **Serverless Functions:** Logic is separated into _Queries_ (read-only) and _Mutations_ (transactional updates).
-- **End-to-End Type Safety:** Data schemas are strictly typed, ensuring consistency between the database and the frontend.
-
-### Frontend Ecosystem
-
-The user interface is constructed using **React 19** and the **TanStack** suite:
-
-- **TanStack Start & Nitro:** Handles Server-Side Rendering (SSR) to ensure fast initial load times.
-- **TanStack Query:** Manages asynchronous state and integrates seamlessly with Convex.
-- **TanStack Router:** Provides type-safe routing across the application.
-- **Styling:** Built with **TailwindCSS** and **ShadCN UI**, featuring a responsive dark-mode design.
-
-### Security & Quality
-
-- **Authentication:** Integrated via **Better Auth**, supporting secure sessions and password hashing.
-- **Testing:** The codebase is covered by over 260 automated tests (Unit, Integration, and Acceptance) using **Vitest** and **Testing Library**, achieving high reliability.
+The frontend uses **React**, **TanStack Start**, and **Tailwind CSS**. **Convex** handles the data and live updates, which means chats and calendars react instantly without a hand-rolled WebSocket layer. **Better Auth** takes care of sessions, while the shared TypeScript stack keeps the UI and backend speaking the same language.
