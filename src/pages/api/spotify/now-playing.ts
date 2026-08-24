@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { Effect, Exit, Option } from "effect";
+import { ConfigProvider, Effect, Exit, Layer, Option } from "effect";
 import { Spotify, type SpotifyError } from "@/lib/spotify";
 
 /** Prevents the live Spotify endpoint from being prerendered. */
@@ -9,6 +9,15 @@ const headers = {
   "Content-Type": "application/json",
   "Cache-Control": "no-cache, no-store, must-revalidate",
 };
+
+const configProvider = ConfigProvider.orElse(
+  ConfigProvider.fromUnknown(import.meta.env),
+  ConfigProvider.fromEnv(),
+);
+
+const SpotifyLive = Spotify.layer.pipe(
+  Layer.provide(ConfigProvider.layer(configProvider)),
+);
 
 const statusForError = (error: SpotifyError): number => {
   switch (error._tag) {
@@ -25,7 +34,7 @@ const statusForError = (error: SpotifyError): number => {
 export const GET: APIRoute = async () => {
   const exit = await Effect.runPromiseExit(
     Spotify.use((spotify) => spotify.nowPlaying()).pipe(
-      Effect.provide(Spotify.layer),
+      Effect.provide(SpotifyLive),
     ),
   );
 

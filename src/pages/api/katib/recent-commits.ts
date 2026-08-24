@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { Effect, Exit, Option } from "effect";
+import { ConfigProvider, Effect, Exit, Layer, Option } from "effect";
 import { Katib, type KatibError } from "@/lib/katib";
 
 /** Prevents the live Katib endpoint from being prerendered. */
@@ -11,6 +11,15 @@ const headers = {
   "Content-Type": "application/json",
   "Cache-Control": "no-cache, no-store, must-revalidate",
 };
+
+const configProvider = ConfigProvider.orElse(
+  ConfigProvider.fromUnknown(import.meta.env),
+  ConfigProvider.fromEnv(),
+);
+
+const KatibLive = Katib.layer.pipe(
+  Layer.provide(ConfigProvider.layer(configProvider)),
+);
 
 const statusForError = (error: KatibError): number => {
   switch (error._tag) {
@@ -34,7 +43,7 @@ export const GET: APIRoute = async ({ request }) => {
 
   const exit = await Effect.runPromiseExit(
     Katib.use((katib) => katib.recentCommits(limit)).pipe(
-      Effect.provide(Katib.layer),
+      Effect.provide(KatibLive),
     ),
   );
 

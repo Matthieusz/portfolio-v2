@@ -104,10 +104,9 @@ interface KatibObjectPayload extends Schema.Schema.Type<
   typeof KatibObjectPayload
 > {}
 
-const KatibPayload = Schema.Union([
-  Schema.Array(RawCommit),
-  KatibObjectPayload,
-]);
+const KatibPayload = Schema.NullOr(
+  Schema.Union([Schema.Array(RawCommit), KatibObjectPayload]),
+);
 
 type KatibPayload = Schema.Schema.Type<typeof KatibPayload>;
 
@@ -373,6 +372,8 @@ const isCommitArray = (
   Schema.is(Schema.Array(RawCommit))(payload);
 
 const normalizePayload = (payload: KatibPayload): RecentCommitsData => {
+  if (payload === null) return { commits: [] };
+
   if (isCommitArray(payload)) {
     return { commits: payload.map(normalizeCommit) };
   }

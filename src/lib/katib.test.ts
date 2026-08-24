@@ -61,6 +61,24 @@ describe("Katib", () => {
     );
   });
 
+  it.effect("normalizes an empty provider response", () => {
+    const fakeFetch: typeof globalThis.fetch = async () => Response.json(null);
+
+    const testLayer = Layer.mergeAll(
+      Katib.layer.pipe(Layer.provide(ConfigProvider.layer(configuration))),
+      Layer.succeed(FetchHttpClient.Fetch, fakeFetch),
+    );
+
+    return Katib.use((katib) => katib.recentCommits(5)).pipe(
+      Effect.provide(testLayer),
+      Effect.tap((result) =>
+        Effect.sync(() => {
+          assert.deepStrictEqual(result, { commits: [] });
+        }),
+      ),
+    );
+  });
+
   it.effect("returns a typed decode error for malformed commits", () => {
     const fakeFetch: typeof globalThis.fetch = async () =>
       Response.json({ commits: "not-an-array" });
