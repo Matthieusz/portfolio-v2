@@ -1,16 +1,29 @@
-// Run this script with: bun scripts/get-spotify-token.ts
-// Follow the instructions to get a valid refresh token
+import { randomBytes } from "node:crypto";
+import { createServer } from "node:http";
+import { spawn } from "node:child_process";
 
-export {};
+// Run with: bun scripts/get-spotify-token.ts
+// The Spotify app must allow http://127.0.0.1:3000/callback as a redirect URI.
+
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
-const REDIRECT_URI = "http://127.0.0.1:3000/callback";
+const CALLBACK_HOST = "127.0.0.1";
+const CALLBACK_PORT = 3000;
+const CALLBACK_PATH = "/callback";
+const REDIRECT_URI = `http://${CALLBACK_HOST}:${CALLBACK_PORT}${CALLBACK_PATH}`;
+const CALLBACK_TIMEOUT_MS = 5 * 60 * 1000;
 
 const SCOPES = [
   "user-read-currently-playing",
   "user-read-recently-played",
   "user-read-playback-state",
 ];
+
+interface SpotifyTokenResponse {
+  refresh_token?: string;
+  error?: string;
+  error_description?: string;
+}
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
   console.error("❌ Missing SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET");
@@ -20,32 +33,112 @@ if (!CLIENT_ID || !CLIENT_SECRET) {
   process.exit(1);
 }
 
-const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES.join(" "))}`;
+const openBrowser = (url: string): void => {
+  const command =
+    process.platform === "darwin"
+      ? "open"
+      : process.platform === "win32"
+        ? "start"
+        : "xdg-open";
 
-console.log("\n🎵 Spotify Refresh Token Generator\n");
-console.log("Step 1: Open this URL in your browser:\n");
-console.log(authUrl);
-console.log("\nStep 2: Authorize the app");
-console.log("\nStep 3: You'll be redirected to a URL like:");
-console.log("        http://127.0.0.1:3000/callback?code=XXXXX");
-console.log("\nStep 4: Copy the 'code' value and paste it below:\n");
+  try {
+    const browser =
+      process.platform === "win32"
+        ? spawn("cmd", ["/c", command, "", url], {
+            detached: true,
+            stdio: "ignore",
+          })
+        : spawn(command, [url], {
+            detached: true,
+            stdio: "ignore",
+          });
+    browser.once("error", () => {
+      // The URL is printed below, so a missing browser command is recoverable.
+    });
+    browser.unref();
+  } catch {
+    // The URL is printed below, so a missing browser command is recoverable.
+  }
+};
 
-const codePrompt = "Enter the authorization code: ";
-process.stdout.write(codePrompt);
+const waitForAuthorizationCode = (
+  authUrl: string,
+  expectedState: string,
+): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const server = createServer((request, response) => {
+      const requestUrl = new URL(request.url ?? "/", REDIRECT_URI);
 
-const code = await new Promise<string>((resolve) => {
-  let input = "";
-  process.stdin.setEncoding("utf-8");
-  process.stdin.on("data", (chunk) => {
-    input += chunk;
-    if (input.includes("\n")) {
-      resolve(input.trim());
-    }
+      if (requestUrl.pathname !== CALLBACK_PATH) {
+        response.writeHead(404).end("Not found");
+        return;
+      }
+
+      const error = requestUrl.searchParams.get("error");
+      if (error) {
+        response.writeHead(400).end("Spotify authorization was denied.");
+        clearTimeout(timeout);
+        server.close();
+        reject(new Error(`Spotify authorization failed: ${error}`));
+        return;
+      }
+
+      if (requestUrl.searchParams.get("state") !== expectedState) {
+        response.writeHead(400).end("Invalid authorization state.");
+        clearTimeout(timeout);
+        server.close();
+        reject(new Error("Spotify authorization returned an invalid state"));
+        return;
+      }
+
+      const code = requestUrl.searchParams.get("code");
+      if (!code) {
+        response.writeHead(400).end("Authorization code was missing.");
+        clearTimeout(timeout);
+        server.close();
+        reject(new Error("Spotify authorization code was missing"));
+        return;
+      }
+
+      response
+        .writeHead(200, { "Content-Type": "text/html; charset=utf-8" })
+        .end(
+          "<h1>Spotify authorization complete</h1><p>You can close this tab.</p>",
+        );
+      clearTimeout(timeout);
+      server.close();
+      resolve(code);
+    });
+
+    const timeout = setTimeout(() => {
+      server.close();
+      reject(new Error("Timed out waiting for Spotify authorization"));
+    }, CALLBACK_TIMEOUT_MS);
+
+    server.once("error", (error) => {
+      clearTimeout(timeout);
+      reject(error);
+    });
+
+    server.listen(CALLBACK_PORT, CALLBACK_HOST, () => {
+      console.log("\n🎵 Spotify Refresh Token Generator\n");
+      console.log("Opening Spotify authorization in your browser...");
+      console.log(`If it does not open, visit this URL manually:\n\n${authUrl}`);
+      console.log("\nWaiting for authorization callback...\n");
+      openBrowser(authUrl);
+    });
   });
-  process.stdin.resume();
-});
 
-console.log("\n🔄 Exchanging code for tokens...\n");
+const state = randomBytes(16).toString("hex");
+const authUrl = new URL("https://accounts.spotify.com/authorize");
+authUrl.searchParams.set("client_id", CLIENT_ID);
+authUrl.searchParams.set("response_type", "code");
+authUrl.searchParams.set("redirect_uri", REDIRECT_URI);
+authUrl.searchParams.set("scope", SCOPES.join(" "));
+authUrl.searchParams.set("state", state);
+
+const code = await waitForAuthorizationCode(authUrl.toString(), state);
+console.log("🔄 Exchanging code for tokens...\n");
 
 const basicAuth = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
   "base64",
@@ -64,15 +157,44 @@ const response = await fetch("https://accounts.spotify.com/api/token", {
   }),
 });
 
-const data = await response.json();
+let responseBody: unknown;
+try {
+  responseBody = await response.json();
+} catch {
+  responseBody = undefined;
+}
+
+const tokenData: SpotifyTokenResponse =
+  typeof responseBody === "object" && responseBody !== null
+    ? {
+        refresh_token:
+          "refresh_token" in responseBody &&
+          typeof responseBody.refresh_token === "string"
+            ? responseBody.refresh_token
+            : undefined,
+        error:
+          "error" in responseBody && typeof responseBody.error === "string"
+            ? responseBody.error
+            : undefined,
+        error_description:
+          "error_description" in responseBody &&
+          typeof responseBody.error_description === "string"
+            ? responseBody.error_description
+            : undefined,
+      }
+    : {};
 
 if (!response.ok) {
-  console.error("❌ Error from Spotify:", data);
+  const reason =
+    tokenData.error_description ?? tokenData.error ?? "Unknown Spotify error";
+  console.error(`❌ Spotify token exchange failed: ${reason}`);
+  process.exit(1);
+}
+
+if (!tokenData.refresh_token) {
+  console.error("❌ Spotify did not return a refresh token");
   process.exit(1);
 }
 
 console.log("✅ Success! Add this to your .env file:\n");
-console.log(`SPOTIFY_REFRESH_TOKEN=${data.refresh_token}`);
-console.log("\n📝 Full response:", JSON.stringify(data, null, 2));
-
-process.exit(0);
+console.log(`SPOTIFY_REFRESH_TOKEN=${tokenData.refresh_token}`);
