@@ -1,24 +1,53 @@
-import { getRecentCommits } from "@/lib/katib";
 import type { APIRoute } from "astro";
+import { Effect, Exit, Option } from "effect";
+import { Katib, type KatibError } from "@/lib/katib";
 
+/** Prevents the live Katib endpoint from being prerendered. */
 export const prerender = false;
 
 const DEFAULT_LIMIT = 5;
 
+const headers = {
+  "Content-Type": "application/json",
+  "Cache-Control": "no-cache, no-store, must-revalidate",
+};
+
+const statusForError = (error: KatibError): number => {
+  switch (error._tag) {
+    case "KatibConfigurationError":
+      return 500;
+    case "KatibTransportError":
+    case "KatibResponseError":
+    case "KatibDecodeError":
+      return 502;
+  }
+};
+
+/** Returns normalized recent commits or a transport-appropriate failure status. */
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
-  const limitParam = url.searchParams.get("limit");
-  const limit = limitParam ? Number(limitParam) : DEFAULT_LIMIT;
+  const requestedLimit = Number(url.searchParams.get("limit") ?? DEFAULT_LIMIT);
+  const limit =
+    Number.isFinite(requestedLimit) && requestedLimit > 0
+      ? requestedLimit
+      : DEFAULT_LIMIT;
 
-  const commits = await getRecentCommits(
-    Number.isFinite(limit) && limit > 0 ? limit : DEFAULT_LIMIT,
+  const exit = await Effect.runPromiseExit(
+    Katib.use((katib) => katib.recentCommits(limit)).pipe(
+      Effect.provide(Katib.layer),
+    ),
   );
 
-  return new Response(JSON.stringify(commits), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-    },
+  if (Exit.isSuccess(exit)) {
+    return new Response(JSON.stringify(exit.value), { status: 200, headers });
+  }
+
+  const status = Option.match(Exit.findErrorOption(exit), {
+    onNone: () => 500,
+    onSome: statusForError,
+  });
+  return new Response(JSON.stringify({ error: "Unable to load commits" }), {
+    status,
+    headers,
   });
 };

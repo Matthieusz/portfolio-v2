@@ -1,12 +1,11 @@
-import { parseJsonSafely } from "./utils";
+import { Config, Context, Effect, Layer, Redacted, Schema } from "effect";
+import {
+  FetchHttpClient,
+  HttpClient,
+  HttpClientRequest,
+  HttpClientResponse,
+} from "effect/unstable/http";
 
-const CLIENT_ID = import.meta.env.SPOTIFY_CLIENT_ID;
-const CLIENT_SECRET = import.meta.env.SPOTIFY_CLIENT_SECRET;
-const REFRESH_TOKEN = import.meta.env.SPOTIFY_REFRESH_TOKEN;
-
-const BASIC_AUTH = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
-  "base64",
-);
 const TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token";
 const NOW_PLAYING_ENDPOINT =
   "https://api.spotify.com/v1/me/player/currently-playing";
@@ -14,252 +13,345 @@ const RECENTLY_PLAYED_ENDPOINT =
   "https://api.spotify.com/v1/me/player/recently-played?limit=5";
 const QUEUE_ENDPOINT = "https://api.spotify.com/v1/me/player/queue";
 
-interface SpotifyToken {
-  access_token: string;
-}
+const SpotifyToken = Schema.Struct({
+  access_token: Schema.String,
+});
 
-interface SpotifyImage {
-  url: string;
-  height: number;
-  width: number;
-}
+const SpotifyImage = Schema.Struct({
+  url: Schema.String,
+});
 
-interface SpotifyArtist {
-  name: string;
-  external_urls: { spotify: string };
-}
+const SpotifyArtist = Schema.Struct({
+  name: Schema.String,
+});
 
-interface SpotifyAlbum {
-  name: string;
-  images: SpotifyImage[];
-  external_urls: { spotify: string };
-}
+const SpotifyAlbum = Schema.Struct({
+  name: Schema.String,
+  images: Schema.Array(SpotifyImage),
+});
 
-interface SpotifyTrack {
-  id: string;
-  name: string;
-  artists: SpotifyArtist[];
-  album: SpotifyAlbum;
-  external_urls: { spotify: string };
-  duration_ms: number;
-}
+const SpotifyTrack = Schema.Struct({
+  id: Schema.String,
+  name: Schema.String,
+  artists: Schema.Array(SpotifyArtist),
+  album: SpotifyAlbum,
+  external_urls: Schema.Struct({ spotify: Schema.String }),
+  duration_ms: Schema.Number,
+});
 
-interface CurrentlyPlayingResponse {
-  is_playing: boolean;
-  item: SpotifyTrack;
-  progress_ms: number;
-}
+interface SpotifyTrack extends Schema.Schema.Type<typeof SpotifyTrack> {}
 
-interface RecentlyPlayedResponse {
-  items: Array<{
-    track: SpotifyTrack;
-    played_at: string;
-  }>;
-}
+const CurrentlyPlayingResponse = Schema.Struct({
+  is_playing: Schema.Boolean,
+  item: Schema.NullOr(SpotifyTrack),
+  progress_ms: Schema.NullOr(Schema.Number),
+});
 
-interface QueueResponse {
-  currently_playing: SpotifyTrack | null;
-  queue: SpotifyTrack[];
-}
-
-export interface TrackInfo {
-  title: string;
-  artist: string;
-  album: string;
-  albumImageUrl: string;
-  songUrl: string;
-}
-
-export interface NowPlayingData {
-  isPlaying: boolean;
-  title: string;
-  artist: string;
-  album: string;
-  albumImageUrl: string;
-  songUrl: string;
-  progress?: number;
-  duration?: number;
-  playedAt?: string;
-  trackId?: string;
-
-  previousTrack?: TrackInfo;
-  upNext?: TrackInfo;
-}
-
-async function getAccessToken(): Promise<SpotifyToken | null> {
-  const response = await fetch(TOKEN_ENDPOINT, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${BASIC_AUTH}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      grant_type: "refresh_token",
-      refresh_token: REFRESH_TOKEN,
+const RecentlyPlayedResponse = Schema.Struct({
+  items: Schema.Array(
+    Schema.Struct({
+      track: SpotifyTrack,
+      played_at: Schema.String,
     }),
-  });
+  ),
+});
 
-  if (!response.ok) return null;
+const QueueResponse = Schema.Struct({
+  queue: Schema.Array(SpotifyTrack),
+});
 
-  const data = await parseJsonSafely<SpotifyToken>(response);
-  if (!data?.access_token) return null;
-
-  return data;
+/** A compact track projection used by the now-playing UI. */
+export interface TrackInfo {
+  readonly title: string;
+  readonly artist: string;
+  readonly album: string;
+  readonly albumImageUrl: string;
+  readonly songUrl: string;
 }
 
-function trackToInfo(track: SpotifyTrack): TrackInfo {
-  return {
-    title: track.name,
-    artist: track.artists.map((a) => a.name).join(", "),
-    album: track.album.name,
-    albumImageUrl: track.album.images[0]?.url ?? "",
-    songUrl: track.external_urls.spotify,
-  };
+/** The Spotify data returned to the browser, including adjacent tracks when available. */
+export interface NowPlayingData {
+  readonly isPlaying: boolean;
+  readonly title: string;
+  readonly artist: string;
+  readonly album: string;
+  readonly albumImageUrl: string;
+  readonly songUrl: string;
+  readonly progress?: number | undefined;
+  readonly duration?: number | undefined;
+  readonly playedAt?: string | undefined;
+  readonly trackId?: string | undefined;
+  readonly previousTrack?: TrackInfo | undefined;
+  readonly upNext?: TrackInfo | undefined;
 }
 
-async function getQueue(
-  accessToken: string,
-): Promise<{ upNext?: TrackInfo } | null> {
-  try {
-    const response = await fetch(QUEUE_ENDPOINT, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+/** Indicates that required Spotify credentials could not be loaded. */
+export class SpotifyConfigurationError extends Schema.TaggedError<SpotifyConfigurationError>()(
+  "SpotifyConfigurationError",
+  { cause: Schema.Defect() },
+) {}
 
-    if (!response.ok) return null;
+/** Indicates that a Spotify request could not reach the provider. */
+export class SpotifyTransportError extends Schema.TaggedError<SpotifyTransportError>()(
+  "SpotifyTransportError",
+  {
+    operation: Schema.String,
+    cause: Schema.Defect(),
+  },
+) {}
 
-    const data = await parseJsonSafely<QueueResponse>(response);
-    if (!data) return null;
+/** Indicates that Spotify rejected a request with a non-success status. */
+export class SpotifyResponseError extends Schema.TaggedError<SpotifyResponseError>()(
+  "SpotifyResponseError",
+  {
+    operation: Schema.String,
+    status: Schema.Int,
+  },
+) {}
 
-    return {
-      upNext: data.queue[0] ? trackToInfo(data.queue[0]) : undefined,
-    };
-  } catch {
-    return null;
-  }
+/** Indicates that a successful Spotify response did not match its wire schema. */
+export class SpotifyDecodeError extends Schema.TaggedError<SpotifyDecodeError>()(
+  "SpotifyDecodeError",
+  {
+    operation: Schema.String,
+    cause: Schema.Defect(),
+  },
+) {}
+
+/** All expected failures produced by the Spotify integration. */
+export type SpotifyError =
+  | SpotifyConfigurationError
+  | SpotifyTransportError
+  | SpotifyResponseError
+  | SpotifyDecodeError;
+
+interface SpotifyConfigurationService {
+  readonly clientId: Redacted.Redacted<string>;
+  readonly clientSecret: Redacted.Redacted<string>;
+  readonly refreshToken: Redacted.Redacted<string>;
 }
 
-async function getRecentTracks(
-  accessToken: string,
-): Promise<{ previousTrack?: TrackInfo } | null> {
-  try {
-    const response = await fetch(RECENTLY_PLAYED_ENDPOINT, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+/** Supplies redacted Spotify credentials to the integration layer. */
+export class SpotifyConfiguration extends Context.Service<
+  SpotifyConfiguration,
+  SpotifyConfigurationService
+>()("portfolio/SpotifyConfiguration") {
+  /** Loads Spotify credentials through Effect Config. */
+  static readonly layer = Layer.effect(
+    SpotifyConfiguration,
+    Effect.gen(function* () {
+      const clientId = yield* Config.redacted("SPOTIFY_CLIENT_ID");
+      const clientSecret = yield* Config.redacted("SPOTIFY_CLIENT_SECRET");
+      const refreshToken = yield* Config.redacted("SPOTIFY_REFRESH_TOKEN");
 
-    if (!response.ok) return null;
-
-    const data = await parseJsonSafely<RecentlyPlayedResponse>(response);
-    if (!data) return null;
-
-    return {
-      previousTrack: data.items[0]
-        ? trackToInfo(data.items[0].track)
-        : undefined,
-    };
-  } catch {
-    return null;
-  }
+      return SpotifyConfiguration.of({
+        clientId,
+        clientSecret,
+        refreshToken,
+      });
+    }).pipe(
+      Effect.mapError((cause) => new SpotifyConfigurationError({ cause })),
+    ),
+  );
 }
 
-export async function getNowPlaying(): Promise<NowPlayingData | null> {
-  try {
-    const token = await getAccessToken();
-    if (!token) return null;
-    const { access_token } = token;
-
-    // Try to get currently playing track
-    const currentlyPlayingResponse = await fetch(NOW_PLAYING_ENDPOINT, {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    });
-
-    // 204 means nothing is playing, check recently played
-    if (
-      currentlyPlayingResponse.status === 204 ||
-      currentlyPlayingResponse.status === 202
-    ) {
-      return getRecentlyPlayed(access_token);
-    }
-
-    if (!currentlyPlayingResponse.ok) {
-      return null;
-    }
-
-    const data = await parseJsonSafely<CurrentlyPlayingResponse>(
-      currentlyPlayingResponse,
-    );
-    if (!data) return null;
-
-    // No track data or it's an ad/podcast
-    if (!data.item) {
-      return getRecentlyPlayed(access_token);
-    }
-
-    // Fetch queue and recent tracks in parallel
-    const [queueData, recentData] = await Promise.all([
-      getQueue(access_token),
-      getRecentTracks(access_token),
-    ]);
-
-    return {
-      isPlaying: data.is_playing,
-      title: data.item.name,
-      artist: data.item.artists.map((artist) => artist.name).join(", "),
-      album: data.item.album.name,
-      albumImageUrl: data.item.album.images[0]?.url ?? "",
-      songUrl: data.item.external_urls.spotify,
-      progress: data.progress_ms,
-      duration: data.item.duration_ms,
-      trackId: data.item.id,
-      previousTrack: recentData?.previousTrack,
-      upNext: queueData?.upNext,
-    };
-  } catch {
-    return null;
-  }
+interface SpotifyService {
+  readonly nowPlaying: () => Effect.Effect<
+    NowPlayingData | null,
+    Exclude<SpotifyError, SpotifyConfigurationError>
+  >;
 }
 
-async function getRecentlyPlayed(
-  accessToken: string,
-): Promise<NowPlayingData | null> {
-  try {
-    const response = await fetch(RECENTLY_PLAYED_ENDPOINT, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+/** Owns Spotify token refresh and the now-playing request workflow. */
+export class Spotify extends Context.Service<Spotify, SpotifyService>()(
+  "portfolio/Spotify",
+) {
+  /** Builds Spotify from explicit configuration and HTTP client dependencies. */
+  static readonly layerNoDependencies = Layer.effect(
+    Spotify,
+    Effect.gen(function* () {
+      const configuration = yield* SpotifyConfiguration;
+      const client = yield* HttpClient.HttpClient;
 
-    if (!response.ok) {
-      return null;
-    }
+      const execute = Effect.fn("Spotify.execute")(function* (
+        operation: string,
+        request: HttpClientRequest.HttpClientRequest,
+      ) {
+        return yield* client
+          .execute(request)
+          .pipe(
+            Effect.mapError(
+              (cause) => new SpotifyTransportError({ operation, cause }),
+            ),
+          );
+      });
 
-    const data = await parseJsonSafely<RecentlyPlayedResponse>(response);
-    if (!data) return null;
-    const tracks = data.items;
+      const requireSuccess = Effect.fn("Spotify.requireSuccess")(function* (
+        operation: string,
+        response: HttpClientResponse.HttpClientResponse,
+      ) {
+        if (response.status < 200 || response.status >= 300) {
+          return yield* new SpotifyResponseError({
+            operation,
+            status: response.status,
+          });
+        }
+        return response;
+      });
 
-    if (!tracks || tracks.length === 0) {
-      return null;
-    }
+      const getAccessToken = Effect.fn("Spotify.getAccessToken")(function* () {
+        const request = HttpClientRequest.post(TOKEN_ENDPOINT).pipe(
+          HttpClientRequest.basicAuth(
+            configuration.clientId,
+            configuration.clientSecret,
+          ),
+          HttpClientRequest.bodyUrlParams({
+            grant_type: "refresh_token",
+            refresh_token: Redacted.value(configuration.refreshToken),
+          }),
+        );
+        const response = yield* execute("Spotify.getAccessToken", request);
+        yield* requireSuccess("Spotify.getAccessToken", response);
+        const token = yield* HttpClientResponse.schemaBodyJson(SpotifyToken)(
+          response,
+        ).pipe(
+          Effect.mapError(
+            (cause) =>
+              new SpotifyDecodeError({
+                operation: "Spotify.getAccessToken",
+                cause,
+              }),
+          ),
+        );
+        return Redacted.make(token.access_token);
+      });
 
-    const track = tracks[0].track;
+      const getRecentTracks = Effect.fn("Spotify.getRecentTracks")(function* (
+        accessToken: Redacted.Redacted<string>,
+      ) {
+        const request = HttpClientRequest.get(RECENTLY_PLAYED_ENDPOINT).pipe(
+          HttpClientRequest.bearerToken(accessToken),
+        );
+        const response = yield* execute("Spotify.getRecentTracks", request);
+        yield* requireSuccess("Spotify.getRecentTracks", response);
+        return yield* HttpClientResponse.schemaBodyJson(RecentlyPlayedResponse)(
+          response,
+        ).pipe(
+          Effect.mapError(
+            (cause) =>
+              new SpotifyDecodeError({
+                operation: "Spotify.getRecentTracks",
+                cause,
+              }),
+          ),
+        );
+      });
 
-    return {
-      isPlaying: false,
-      title: track.name,
-      artist: track.artists.map((artist) => artist.name).join(", "),
-      album: track.album.name,
-      albumImageUrl: track.album.images[0]?.url ?? "",
-      songUrl: track.external_urls.spotify,
-      playedAt: tracks[0].played_at,
-      trackId: track.id,
-      previousTrack: tracks[1] ? trackToInfo(tracks[1].track) : undefined,
-    };
-  } catch {
-    return null;
-  }
+      const getQueue = Effect.fn("Spotify.getQueue")(function* (
+        accessToken: Redacted.Redacted<string>,
+      ) {
+        const request = HttpClientRequest.get(QUEUE_ENDPOINT).pipe(
+          HttpClientRequest.bearerToken(accessToken),
+        );
+        const response = yield* execute("Spotify.getQueue", request);
+        yield* requireSuccess("Spotify.getQueue", response);
+        return yield* HttpClientResponse.schemaBodyJson(QueueResponse)(
+          response,
+        ).pipe(
+          Effect.mapError(
+            (cause) =>
+              new SpotifyDecodeError({
+                operation: "Spotify.getQueue",
+                cause,
+              }),
+          ),
+        );
+      });
+
+      const getRecentlyPlayed = Effect.fn("Spotify.getRecentlyPlayed")(
+        function* (accessToken: Redacted.Redacted<string>) {
+          const data = yield* getRecentTracks(accessToken);
+          const current = data.items[0];
+          if (current === undefined) return null;
+
+          return {
+            isPlaying: false,
+            ...trackToInfo(current.track),
+            playedAt: current.played_at,
+            trackId: current.track.id,
+            previousTrack:
+              data.items[1] === undefined
+                ? undefined
+                : trackToInfo(data.items[1].track),
+          } satisfies NowPlayingData;
+        },
+      );
+
+      const nowPlaying = Effect.fn("Spotify.nowPlaying")(function* () {
+        const accessToken = yield* getAccessToken();
+        const request = HttpClientRequest.get(NOW_PLAYING_ENDPOINT).pipe(
+          HttpClientRequest.bearerToken(accessToken),
+        );
+        const response = yield* execute("Spotify.nowPlaying", request);
+
+        if (response.status === 202 || response.status === 204) {
+          return yield* getRecentlyPlayed(accessToken);
+        }
+
+        yield* requireSuccess("Spotify.nowPlaying", response);
+        const current = yield* HttpClientResponse.schemaBodyJson(
+          CurrentlyPlayingResponse,
+        )(response).pipe(
+          Effect.mapError(
+            (cause) =>
+              new SpotifyDecodeError({
+                operation: "Spotify.nowPlaying",
+                cause,
+              }),
+          ),
+        );
+
+        if (current.item === null) {
+          return yield* getRecentlyPlayed(accessToken);
+        }
+
+        const [queue, recent] = yield* Effect.all(
+          [getQueue(accessToken), getRecentTracks(accessToken)],
+          { concurrency: "unbounded" },
+        );
+
+        return {
+          isPlaying: current.is_playing,
+          ...trackToInfo(current.item),
+          progress: current.progress_ms ?? undefined,
+          duration: current.item.duration_ms,
+          trackId: current.item.id,
+          previousTrack:
+            recent.items[0] === undefined
+              ? undefined
+              : trackToInfo(recent.items[0].track),
+          upNext:
+            queue.queue[0] === undefined
+              ? undefined
+              : trackToInfo(queue.queue[0]),
+        } satisfies NowPlayingData;
+      });
+
+      return Spotify.of({ nowPlaying });
+    }),
+  );
+
+  /** Provides the production configuration and fetch-backed HTTP client. */
+  static readonly layer = Spotify.layerNoDependencies.pipe(
+    Layer.provide(SpotifyConfiguration.layer),
+    Layer.provide(FetchHttpClient.layer),
+  );
 }
+
+const trackToInfo = (track: SpotifyTrack): TrackInfo => ({
+  title: track.name,
+  artist: track.artists.map((artist) => artist.name).join(", "),
+  album: track.album.name,
+  albumImageUrl: track.album.images[0]?.url ?? "",
+  songUrl: track.external_urls.spotify,
+});

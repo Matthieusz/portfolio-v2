@@ -1,13 +1,4 @@
-export const parseJsonSafely = async <T>(
-  response: Response,
-): Promise<T | null> => {
-  try {
-    return (await response.json()) as T;
-  } catch {
-    return null;
-  }
-};
-
+/** Converts arbitrary display text into a lowercase URL slug. */
 export const slugify = (value: string): string =>
   value
     .normalize("NFKD")
