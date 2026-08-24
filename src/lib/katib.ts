@@ -13,6 +13,7 @@ import {
   HttpClientRequest,
   HttpClientResponse,
 } from "effect/unstable/http";
+import type { RecentCommit, RecentCommitsData } from "./katib-contract";
 
 const KATIB_ENDPOINT = "https://katib.jasoncameron.dev/v2/commits/latest";
 
@@ -109,24 +110,6 @@ const KatibPayload = Schema.NullOr(
 );
 
 type KatibPayload = Schema.Schema.Type<typeof KatibPayload>;
-
-/** A normalized commit projection consumed by the recent-commits UI. */
-export interface RecentCommit {
-  readonly message: string;
-  readonly repo: string;
-  readonly url?: string | undefined;
-  readonly sha?: string | undefined;
-  readonly date?: string | undefined;
-  readonly additions?: number | undefined;
-  readonly deletions?: number | undefined;
-  readonly filesChanged?: number | undefined;
-}
-
-/** The normalized result returned by the Katib integration. */
-export interface RecentCommitsData {
-  readonly commits: ReadonlyArray<RecentCommit>;
-  readonly totalCommits?: number | undefined;
-}
 
 /** Indicates that Katib configuration could not be loaded. */
 export class KatibConfigurationError extends Schema.TaggedError<KatibConfigurationError>()(

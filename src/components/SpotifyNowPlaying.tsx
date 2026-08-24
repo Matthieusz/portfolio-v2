@@ -1,3 +1,4 @@
+import { Schema } from "effect";
 import {
   createEffect,
   createMemo,
@@ -7,9 +8,16 @@ import {
   type Component,
   type JSX,
 } from "solid-js";
-import type { NowPlayingData, TrackInfo } from "../lib/spotify";
+import {
+  NowPlayingResponse,
+  type NowPlayingData,
+  type TrackInfo,
+} from "../lib/spotify-contract";
 import InfoTooltip from "./InfoTooltip";
 
+const decodeNowPlayingResponse = Schema.decodeUnknownPromise(
+  NowPlayingResponse,
+);
 const POLL_INTERVAL = 10000;
 const PROGRESS_UPDATE_INTERVAL = 1000;
 
@@ -179,7 +187,8 @@ const SpotifyNowPlaying: Component = () => {
   const fetchNowPlaying = async () => {
     try {
       const response = await fetch("/api/spotify/now-playing");
-      const newData: NowPlayingData | null = await response.json();
+      const payload: unknown = await response.json();
+      const newData = await decodeNowPlayingResponse(payload);
       setData(newData);
       if (newData?.progress !== undefined) {
         setLocalProgress(newData.progress);

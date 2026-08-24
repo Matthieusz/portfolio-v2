@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
-import { ConfigProvider, Effect, Exit, Layer, Option } from "effect";
+import { Effect, Exit, Layer, Option } from "effect";
+import { runtimeConfigLayer } from "@/lib/runtime-config";
 import { Spotify, type SpotifyError } from "@/lib/spotify";
 
 /** Prevents the live Spotify endpoint from being prerendered. */
@@ -10,14 +11,7 @@ const headers = {
   "Cache-Control": "no-cache, no-store, must-revalidate",
 };
 
-const configProvider = ConfigProvider.orElse(
-  ConfigProvider.fromUnknown(import.meta.env),
-  ConfigProvider.fromEnv(),
-);
-
-const SpotifyLive = Spotify.layer.pipe(
-  Layer.provide(ConfigProvider.layer(configProvider)),
-);
+const SpotifyLive = Spotify.layer.pipe(Layer.provide(runtimeConfigLayer));
 
 const statusForError = (error: SpotifyError): number => {
   switch (error._tag) {

@@ -5,6 +5,7 @@ import {
   HttpClientRequest,
   HttpClientResponse,
 } from "effect/unstable/http";
+import type { NowPlayingData, TrackInfo } from "./spotify-contract";
 
 const TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token";
 const NOW_PLAYING_ENDPOINT =
@@ -59,31 +60,6 @@ const RecentlyPlayedResponse = Schema.Struct({
 const QueueResponse = Schema.Struct({
   queue: Schema.Array(SpotifyTrack),
 });
-
-/** A compact track projection used by the now-playing UI. */
-export interface TrackInfo {
-  readonly title: string;
-  readonly artist: string;
-  readonly album: string;
-  readonly albumImageUrl: string;
-  readonly songUrl: string;
-}
-
-/** The Spotify data returned to the browser, including adjacent tracks when available. */
-export interface NowPlayingData {
-  readonly isPlaying: boolean;
-  readonly title: string;
-  readonly artist: string;
-  readonly album: string;
-  readonly albumImageUrl: string;
-  readonly songUrl: string;
-  readonly progress?: number | undefined;
-  readonly duration?: number | undefined;
-  readonly playedAt?: string | undefined;
-  readonly trackId?: string | undefined;
-  readonly previousTrack?: TrackInfo | undefined;
-  readonly upNext?: TrackInfo | undefined;
-}
 
 /** Indicates that required Spotify credentials could not be loaded. */
 export class SpotifyConfigurationError extends Schema.TaggedError<SpotifyConfigurationError>()(

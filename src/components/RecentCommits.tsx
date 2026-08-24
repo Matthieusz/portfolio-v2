@@ -1,3 +1,4 @@
+import { Schema } from "effect";
 import {
   createMemo,
   createSignal,
@@ -8,9 +9,13 @@ import {
   Match,
   type Component,
 } from "solid-js";
-import type { RecentCommit, RecentCommitsData } from "../lib/katib";
+import {
+  RecentCommitsData,
+  type RecentCommit,
+} from "../lib/katib-contract";
 import InfoTooltip from "./InfoTooltip";
 
+const decodeRecentCommitsData = Schema.decodeUnknownPromise(RecentCommitsData);
 const POLL_INTERVAL = 60000;
 
 const formatDate = (value: string | undefined): string => {
@@ -175,8 +180,9 @@ const RecentCommits: Component = () => {
         setErrorMessage("Unable to load commits right now.");
         return;
       }
-      const payload: RecentCommitsData | null = await response.json();
-      setData(payload);
+      const payload: unknown = await response.json();
+      const commitsData = await decodeRecentCommitsData(payload);
+      setData(commitsData);
       setErrorMessage(null);
     } catch {
       setErrorMessage("Unable to load commits right now.");

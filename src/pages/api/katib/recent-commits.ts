@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
-import { ConfigProvider, Effect, Exit, Layer, Option } from "effect";
+import { Effect, Exit, Layer, Option } from "effect";
 import { Katib, type KatibError } from "@/lib/katib";
+import { runtimeConfigLayer } from "@/lib/runtime-config";
 
 /** Prevents the live Katib endpoint from being prerendered. */
 export const prerender = false;
@@ -12,14 +13,7 @@ const headers = {
   "Cache-Control": "no-cache, no-store, must-revalidate",
 };
 
-const configProvider = ConfigProvider.orElse(
-  ConfigProvider.fromUnknown(import.meta.env),
-  ConfigProvider.fromEnv(),
-);
-
-const KatibLive = Katib.layer.pipe(
-  Layer.provide(ConfigProvider.layer(configProvider)),
-);
+const KatibLive = Katib.layer.pipe(Layer.provide(runtimeConfigLayer));
 
 const statusForError = (error: KatibError): number => {
   switch (error._tag) {
