@@ -1,13 +1,31 @@
 {
+  "$schema": "https://raw.githubusercontent.com/Effect-TS/language-service/refs/heads/main/schema.json",
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
+    "incremental": true,
+    "target": "ES2022",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "rewriteRelativeImportExtensions": true,
+    "strict": true,
     "strictNullChecks": true,
+    "exactOptionalPropertyTypes": true,
+    "noUnusedLocals": true,
+    "noImplicitOverride": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "noEmit": true,
     "paths": {
       "@/*": ["./src/*"]
     },
     "plugins": [
+      {
+        "name": "@effect/language-service"
+      },
       {
         "name": "@astrojs/ts-plugin"
       }

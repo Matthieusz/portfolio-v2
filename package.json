@@ -7,7 +7,12 @@
     "build": "astro build",
     "start": "node ./dist/server/entry.mjs",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "prepare": "effect-language-service patch",
+    "typecheck": "astro check"
   },
   "dependencies": {
     "@astrojs/check": "0.9.10",
@@ -20,6 +25,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.2.5",
     "astro-seo": "^1.1.0",
+    "effect": "^4.0.0-rc.111",
     "solid-js": "^1.9.15",
     "tailwind-merge": "^3.6.0",
     "tailwind-variants": "^3.3.1",
@@ -28,10 +34,15 @@
     "typescript": "^6.0.3"
   },
   "devDependencies": {
+    "@effect/language-service": "^0.87.2",
+    "@effect/vitest": "^4.0.0-rc.111",
+    "@oxlint/plugins": "1.80.0",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^26.2.0",
+    "oxlint": "1.80.0",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.8.1"
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "vitest": "^4.1.0"
   }
 }
