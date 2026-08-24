@@ -21,7 +21,7 @@ export const getStaticPaths = async () => {
 const { projectId } = Astro.props;
 
 const project =
-  typeof projectId === "string" ? await getEntry("projects", projectId) : null;
+  projectId === undefined ? null : await getEntry("projects", projectId);
 
 if (!project) {
   return Astro.redirect("/projects");
@@ -32,9 +32,10 @@ const { date, demoLink, repoLink, tags, title } = project.data;
 
 const projectDir = project.id.split("/")[0];
 
-const allGlobs = import.meta.glob("/src/content/projects/**/*.png", {
-  eager: true,
-});
+const allGlobs = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/content/projects/**/*.png",
+  { eager: true },
+);
 
 const rawImages = Object.entries(allGlobs)
   .filter(([path]) =>
@@ -50,7 +51,7 @@ const rawImages = Object.entries(allGlobs)
       : 0;
 
     return {
-      mod: mod as Record<string, unknown>,
+      mod,
       name,
       timestamp,
     };
@@ -59,7 +60,7 @@ const rawImages = Object.entries(allGlobs)
 
 const imageEntries = await Promise.all(
   rawImages.map(async (img) => {
-    const meta = img.mod.default as ImageMetadata;
+    const meta = img.mod.default;
     const optimized = await getImage({
       src: meta,
       format: "webp",

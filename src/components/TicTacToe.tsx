@@ -14,9 +14,7 @@ const WINNING_COMBOS = [
   [2, 4, 6], // diagonals
 ] as const;
 
-const checkWinner = (
-  b: Board,
-): { winner: Player; combo: readonly number[] | null } => {
+const checkWinner = (b: Board) => {
   for (const combo of WINNING_COMBOS) {
     const [a, c, d] = combo;
     if (b[a] && b[a] === b[c] && b[a] === b[d]) {

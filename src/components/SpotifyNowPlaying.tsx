@@ -290,11 +290,15 @@ const SpotifyNowPlaying: Component = () => {
                   </div>
 
                   <div
-                    ref={titleContainerRef}
+                    ref={(element) => {
+                      titleContainerRef = element;
+                    }}
                     class="marquee-container overflow-hidden"
                   >
                     <a
-                      ref={titleRef}
+                      ref={(element) => {
+                        titleRef = element;
+                      }}
                       href={currentData().songUrl}
                       target="_blank"
                       rel="noopener noreferrer"

@@ -12,7 +12,7 @@ type Props = HTMLAttributes<"div"> & {
    */
   closeDelay?: number;
 
-  children: any;
+  children: unknown;
 };
 
 const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Astro.props;
@@ -29,6 +29,13 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
 </div>
 
 <script>
+  interface DropdownMetadata {
+    readonly handler: DropdownHandler;
+    readonly rootDropdown: HTMLElement;
+  }
+
+  const dropdownMetadata = new WeakMap<HTMLElement, DropdownMetadata>();
+
   class DropdownHandler {
     private dropdown: HTMLElement;
     private trigger: HTMLElement | null;
@@ -61,19 +68,23 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
 
       // if trigger is set with asChild, use the first child element for trigger button
       if (this.trigger?.hasAttribute("data-as-child")) {
-        this.trigger = this.trigger.firstElementChild as HTMLElement;
+        const child = this.trigger.firstElementChild;
+        this.trigger = child instanceof HTMLElement ? child : null;
       }
 
       this.content = this.findOwnElement('[data-slot="dropdown-content"]');
 
       // Resolve root dropdown before any portaling (DOM is in original state)
+      const rootDropdown = this.dropdown.closest(".starwind-dropdown");
       this.rootDropdown =
-        (this.dropdown.closest(".starwind-dropdown") as HTMLElement) || this.dropdown;
+        rootDropdown instanceof HTMLElement ? rootDropdown : this.dropdown;
 
       // Store handler reference and root dropdown on content element for lookups
       if (this.content) {
-        (this.content as any).__dropdownHandler = this;
-        (this.content as any).__rootDropdown = this.rootDropdown;
+        dropdownMetadata.set(this.content, {
+          handler: this,
+          rootDropdown: this.rootDropdown,
+        });
       }
 
       if (!this.trigger || !this.content) return;
@@ -92,8 +103,12 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
     private findOwnElement(selector: string): HTMLElement | null {
       const elements = this.dropdown.querySelectorAll(selector);
       for (const el of elements) {
-        if (el.closest(".starwind-dropdown, .starwind-dropdown-sub") === this.dropdown) {
-          return el as HTMLElement;
+        if (
+          el.closest(".starwind-dropdown, .starwind-dropdown-sub") ===
+            this.dropdown &&
+          el instanceof HTMLElement
+        ) {
+          return el;
         }
       }
       return null;
@@ -169,9 +184,12 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
       });
 
       // Listen for close-all event (routed through rootDropdown to work across portaled content)
-      this.rootDropdown.addEventListener("starwind-dropdown:close-all", ((e: CustomEvent) => {
-        this.closeDropdown({ skipFocus: e.detail?.focusRoot && this.isSubmenu });
-      }) as EventListener);
+      this.rootDropdown.addEventListener("starwind-dropdown:close-all", (event) => {
+        if (!(event instanceof CustomEvent)) return;
+        this.closeDropdown({
+          skipFocus: event.detail?.focusRoot && this.isSubmenu,
+        });
+      });
 
       // Listen for cancel-close event (routed through rootDropdown)
       this.rootDropdown.addEventListener("starwind-dropdown:cancel-close", () => {
@@ -180,11 +198,13 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
 
       // Close dropdown when clicking outside for mouse
       document.addEventListener("pointerdown", (e) => {
+        const target = e.target;
+        if (!(target instanceof Node)) return;
         if (
           this.isOpen &&
-          !this.dropdown.contains(e.target as Node) &&
-          !this.content?.contains(e.target as Node) &&
-          !this.isTargetInGroup(e.target as Node)
+          !this.dropdown.contains(target) &&
+          !this.content?.contains(target) &&
+          !this.isTargetInGroup(target)
         ) {
           if (e.button === 0 && e.ctrlKey === false && e.pointerType === "mouse") {
             this.closeDropdown();
@@ -194,11 +214,13 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
 
       // Handle click outside select content to close for mobile
       document.addEventListener("click", (e) => {
+        const target = e.target;
+        if (!(target instanceof Node)) return;
         if (
           this.isOpen &&
-          !this.trigger?.contains(e.target as Node) &&
-          !this.content?.contains(e.target as Node) &&
-          !this.isTargetInGroup(e.target as Node)
+          !this.trigger?.contains(target) &&
+          !this.content?.contains(target) &&
+          !this.isTargetInGroup(target)
         ) {
           this.closeDropdown();
         }
@@ -220,9 +242,9 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
 
       // Handle item selection
       this.content.addEventListener("click", (e) => {
-        const target = e.target as HTMLElement;
-        const item = target.closest('[role="menuitem"]');
-        if (item && !(item as HTMLElement).hasAttribute("data-disabled")) {
+        if (!(e.target instanceof HTMLElement)) return;
+        const item = e.target.closest('[role="menuitem"]');
+        if (item instanceof HTMLElement && !item.hasAttribute("data-disabled")) {
           if (item.hasAttribute("aria-haspopup")) return;
 
           // Close the dropdown after item selection
@@ -235,8 +257,8 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
 
       // Handle hover on dropdown items
       this.content.addEventListener("mouseover", (e) => {
-        const target = e.target as HTMLElement;
-        const menuItem = target.closest('[role="menuitem"]');
+        if (!(e.target instanceof HTMLElement)) return;
+        const menuItem = e.target.closest('[role="menuitem"]');
         if (menuItem && menuItem instanceof HTMLElement && this.isOpen === true) {
           // Update items list before focusing to ensure the index is correct
           this.updateDropdownItems();
@@ -339,17 +361,18 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
       const el = target instanceof HTMLElement ? target : target.parentElement;
       if (!el) return false;
       const contentEl = el.closest('[data-slot="dropdown-content"]');
-      return !!contentEl && (contentEl as any).__rootDropdown === this.rootDropdown;
+      if (!(contentEl instanceof HTMLElement)) return false;
+      return dropdownMetadata.get(contentEl)?.rootDropdown === this.rootDropdown;
     }
 
     private updateDropdownItems() {
       if (!this.content) return;
       // Get all interactive menuitem elements belonging to this menu level only
-      this.items = (
-        Array.from(
-          this.content.querySelectorAll('[role="menuitem"]:not([data-disabled="true"])'),
-        ) as HTMLElement[]
-      ).filter((item) => item.closest('[role="menu"]') === this.content);
+      this.items = Array.from(
+        this.content.querySelectorAll('[role="menuitem"]:not([data-disabled="true"])'),
+      )
+        .filter((item): item is HTMLElement => item instanceof HTMLElement)
+        .filter((item) => item.closest('[role="menu"]') === this.content);
     }
 
     private focusItem(idx: number) {
@@ -372,7 +395,12 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
 
     private openDropdown() {
       if (this.isClosing) return;
-      if (!this.content || !this.trigger || (this.trigger as any).disabled) return;
+      if (
+        !this.content ||
+        !this.trigger ||
+        (this.trigger instanceof HTMLButtonElement && this.trigger.disabled)
+      )
+        return;
 
       this.isOpen = true;
       this.trigger.setAttribute("aria-expanded", "true");
@@ -485,8 +513,8 @@ const { class: className, openOnHover = false, closeDelay = 200, ...rest } = Ast
 
       // Find and link to parent handler for child-tracking
       const parentContent = this.trigger.closest('[data-slot="dropdown-content"]');
-      if (parentContent) {
-        this.parentHandler = (parentContent as any).__dropdownHandler || null;
+      if (parentContent instanceof HTMLElement) {
+        this.parentHandler = dropdownMetadata.get(parentContent)?.handler ?? null;
         if (this.parentHandler) {
           this.parentHandler.openChildCount++;
         }

@@ -16,9 +16,9 @@ const { class: className, ...rest } = Astro.props;
   let dialogCounter = 0;
 
   class DialogHandler {
-    private triggers: HTMLButtonElement[] = [];
+    private triggers: HTMLElement[] = [];
     private dialog: HTMLDialogElement | null = null;
-    private closeButtons: HTMLButtonElement[] = [];
+    private closeButtons: HTMLElement[] = [];
     private backdrop: HTMLElement | null = null;
     private dialogWrapper: HTMLElement;
     private dialogId: string;
@@ -66,16 +66,11 @@ const { class: className, ...rest } = Astro.props;
       // Find internal triggers and handle them
       const internalTriggers = dialogWrapper.querySelectorAll(".starwind-dialog-trigger");
       internalTriggers.forEach((triggerElement) => {
-        const tempTrigger = triggerElement as HTMLElement;
-        let trigger: HTMLButtonElement;
+        const trigger = triggerElement.hasAttribute("data-as-child")
+          ? triggerElement.firstElementChild
+          : triggerElement;
 
-        if (tempTrigger?.hasAttribute("data-as-child")) {
-          trigger = tempTrigger.firstElementChild as HTMLButtonElement;
-        } else {
-          trigger = tempTrigger as HTMLButtonElement;
-        }
-
-        if (trigger) {
+        if (trigger instanceof HTMLElement) {
           this.triggers.push(trigger);
         }
       });
@@ -86,9 +81,9 @@ const { class: className, ...rest } = Astro.props;
       // if closeButtons are set with asChild, swap the wrapper with its first child
       const tempCloseButtons = dialogWrapper.querySelectorAll(
         ".starwind-dialog-close",
-      ) as NodeListOf<HTMLElement>;
-      tempCloseButtons.forEach((button: HTMLElement) => {
-        if (button.hasAttribute("data-as-child")) {
+      );
+      tempCloseButtons.forEach((button) => {
+        if (button instanceof HTMLElement && button.hasAttribute("data-as-child")) {
           const childElement = button.firstElementChild;
           if (childElement) {
             childElement.classList.add("starwind-dialog-close");
@@ -101,7 +96,7 @@ const { class: className, ...rest } = Astro.props;
       // Convert NodeList to Array for consistency with triggers
       this.closeButtons = Array.from(
         dialogWrapper.querySelectorAll(".starwind-dialog-close"),
-      ) as HTMLButtonElement[];
+      ).filter((button): button is HTMLElement => button instanceof HTMLElement);
 
       // if essential elements are not there, exit
       if (!this.dialog || !this.backdrop) return;
@@ -136,14 +131,11 @@ const { class: className, ...rest } = Astro.props;
           return;
         }
 
-        let trigger: HTMLButtonElement;
-        if (triggerElement.hasAttribute("data-as-child")) {
-          trigger = triggerElement.firstElementChild as HTMLButtonElement;
-        } else {
-          trigger = triggerElement as HTMLButtonElement;
-        }
+        const trigger = triggerElement.hasAttribute("data-as-child")
+          ? triggerElement.firstElementChild
+          : triggerElement;
 
-        if (trigger && !this.triggers.includes(trigger)) {
+        if (trigger instanceof HTMLElement && !this.triggers.includes(trigger)) {
           this.triggers.push(trigger);
         }
       });
@@ -349,7 +341,10 @@ const { class: className, ...rest } = Astro.props;
       const parentDialogWrapper = this.dialogWrapper.parentElement?.closest(".starwind-dialog");
       if (parentDialogWrapper) {
         this.isNested = true;
-        const parentInstance = dialogInstances.get(parentDialogWrapper as HTMLElement);
+        const parentInstance =
+          parentDialogWrapper instanceof HTMLElement
+            ? dialogInstances.get(parentDialogWrapper)
+            : undefined;
         if (parentInstance) {
           this.parentDialog = parentInstance;
         }
@@ -361,7 +356,8 @@ const { class: className, ...rest } = Astro.props;
   const setupDialogs = () => {
     // First pass: create all dialog instances
     document.querySelectorAll(".starwind-dialog").forEach((dialogWrapper) => {
-      const wrapper = dialogWrapper as HTMLElement;
+      if (!(dialogWrapper instanceof HTMLElement)) return;
+      const wrapper = dialogWrapper;
       if (!dialogInstances.has(wrapper)) {
         dialogInstances.set(wrapper, new DialogHandler(wrapper, dialogCounter++));
       }
@@ -369,7 +365,8 @@ const { class: className, ...rest } = Astro.props;
 
     // Second pass: link parent dialogs (now that all instances exist)
     document.querySelectorAll(".starwind-dialog").forEach((dialogWrapper) => {
-      const wrapper = dialogWrapper as HTMLElement;
+      if (!(dialogWrapper instanceof HTMLElement)) return;
+      const wrapper = dialogWrapper;
       const instance = dialogInstances.get(wrapper);
       if (instance) {
         instance.linkParentDialog();

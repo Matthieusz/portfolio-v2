@@ -2,7 +2,7 @@ import { createMemo, createSignal, onMount, type Component } from "solid-js";
 
 type TimeOfDay = "night" | "sunrise" | "noon" | "sunset";
 
-const ASCII_ART: Record<TimeOfDay, string> = {
+const ASCII_ART = {
   night: `
   *         *                                *                
                    *       @@@@@@@@@@@@                *      
@@ -67,7 +67,7 @@ __________ ____________&&&&&&&&&&&&&&&&&&&&___________ _______
 ~       ~ ~      ~           ~~ ~~~~~~  ~      ~~  ~          
    ~             ~        ~      ~      ~~   ~             ~  
 `,
-};
+} satisfies Record<TimeOfDay, string>;
 
 const TIME_RANGES: { start: number; end: number; period: TimeOfDay }[] = [
   { start: 0, end: 6, period: "night" },
