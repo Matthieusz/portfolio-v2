@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
+import { Effect, Schema } from "effect";
 
 // Run with: bun scripts/get-spotify-token.ts
 // The Spotify app must allow http://127.0.0.1:3000/callback as a redirect URI.
@@ -19,11 +20,15 @@ const SCOPES = [
   "user-read-playback-state",
 ];
 
-interface SpotifyTokenResponse {
-  refresh_token?: string;
-  error?: string;
-  error_description?: string;
-}
+const SpotifyTokenResponseSchema = Schema.Struct({
+  refresh_token: Schema.optionalKey(Schema.String),
+  error: Schema.optionalKey(Schema.String),
+  error_description: Schema.optionalKey(Schema.String),
+});
+
+type SpotifyTokenResponse = Schema.Schema.Type<
+  typeof SpotifyTokenResponseSchema
+>;
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
   console.error("❌ Missing SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET");
@@ -164,25 +169,14 @@ try {
   responseBody = undefined;
 }
 
-const tokenData: SpotifyTokenResponse =
-  typeof responseBody === "object" && responseBody !== null
-    ? {
-        refresh_token:
-          "refresh_token" in responseBody &&
-          typeof responseBody.refresh_token === "string"
-            ? responseBody.refresh_token
-            : undefined,
-        error:
-          "error" in responseBody && typeof responseBody.error === "string"
-            ? responseBody.error
-            : undefined,
-        error_description:
-          "error_description" in responseBody &&
-          typeof responseBody.error_description === "string"
-            ? responseBody.error_description
-            : undefined,
-      }
-    : {};
+let tokenData: SpotifyTokenResponse;
+try {
+  tokenData = await Effect.runPromise(
+    Schema.decodeUnknownEffect(SpotifyTokenResponseSchema)(responseBody),
+  );
+} catch {
+  tokenData = {};
+}
 
 if (!response.ok) {
   const reason =
