@@ -9,10 +9,7 @@ import {
   Match,
   type Component,
 } from "solid-js";
-import {
-  RecentCommitsData,
-  type RecentCommit,
-} from "../lib/katib-contract";
+import { RecentCommitsData, type RecentCommit } from "../lib/katib-contract";
 import InfoTooltip from "./InfoTooltip";
 
 const decodeRecentCommitsData = Schema.decodeUnknownPromise(RecentCommitsData);
@@ -100,13 +97,9 @@ const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
   <div class="flex items-start justify-between gap-4">
     <div class="w-full min-w-0">
       <div class="flex items-center justify-between gap-2">
-        <p class="text-muted-foreground text-xs uppercase">
-          {props.commit.repo}
-        </p>
+        <p class="text-muted-foreground text-xs uppercase">{props.commit.repo}</p>
         <div class="text-muted-foreground flex items-center justify-center gap-1 text-xs">
-          <time datetime={props.commit.date ?? undefined}>
-            {formatDate(props.commit.date)}
-          </time>
+          <time datetime={props.commit.date ?? undefined}>{formatDate(props.commit.date)}</time>
           <Show when={props.commit.sha}>
             {(sha) => (
               <span class="bg-muted rounded px-1.5 py-0.5 font-mono text-[0.65rem]">
@@ -120,9 +113,7 @@ const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
         <Show
           when={props.commit.url}
           fallback={
-            <p class="text-foreground truncate text-sm font-medium">
-              {props.commit.message}
-            </p>
+            <p class="text-foreground truncate text-sm font-medium">{props.commit.message}</p>
           }
         >
           {(url) => (
@@ -136,29 +127,17 @@ const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
             </a>
           )}
         </Show>
-        <Show
-          when={
-            props.commit.additions ||
-            props.commit.deletions ||
-            props.commit.filesChanged
-          }
-        >
+        <Show when={props.commit.additions || props.commit.deletions || props.commit.filesChanged}>
           <div class="text-muted-foreground flex shrink-0 flex-row items-end text-[0.65rem]">
-            <Show when={props.commit.filesChanged}>
-              {(files) => <span>{files()} files</span>}
-            </Show>
+            <Show when={props.commit.filesChanged}>{(files) => <span>{files()} files</span>}</Show>
             <Show when={props.commit.additions}>
-              {(additions) => (
-                <span class="text-success text-sm"> +{additions()} </span>
-              )}
+              {(additions) => <span class="text-success text-sm"> +{additions()} </span>}
             </Show>
             <Show when={props.commit.additions && props.commit.deletions}>
               <span class="ml-1 text-sm">/</span>
             </Show>
             <Show when={props.commit.deletions}>
-              {(deletions) => (
-                <span class="text-error text-sm"> -{deletions()} </span>
-              )}
+              {(deletions) => <span class="text-error text-sm"> -{deletions()} </span>}
             </Show>
           </div>
         </Show>
@@ -228,9 +207,7 @@ const RecentCommits: Component = () => {
           </Match>
           <Match when={commits().length > 0}>
             <div class="flex flex-col gap-3">
-              <For each={commits().slice(0, 5)}>
-                {(commit) => <CommitRow commit={commit} />}
-              </For>
+              <For each={commits().slice(0, 5)}>{(commit) => <CommitRow commit={commit} />}</For>
             </div>
           </Match>
         </Switch>
