@@ -12,6 +12,8 @@ const {
   zoom = 12,
   label = "Poznań, Poland",
 } = Astro.props;
+
+const CARTO_KEY = import.meta.env.CARTO_BASEMAP_API_KEY;
 ---
 
 <div
@@ -21,6 +23,7 @@ const {
   data-lng={lng}
   data-zoom={zoom}
   data-label={label}
+  data-carto-key={CARTO_KEY}
 >
   <h3
     class="text-muted-foreground mb-3 flex items-center justify-between gap-2 px-2 pt-2 text-xs font-medium tracking-wider uppercase"
@@ -173,7 +176,8 @@ const {
 
     // Dark theme tile layer
     L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=" +
+        (container.dataset.cartoKey || ""),
       {
         maxZoom: 19,
       },
