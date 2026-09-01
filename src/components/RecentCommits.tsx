@@ -16,7 +16,7 @@ import {
 import InfoTooltip from "./InfoTooltip";
 
 const decodeRecentCommitsData = Schema.decodeUnknownPromise(RecentCommitsData);
-const POLL_INTERVAL = 60000;
+const POLL_INTERVAL = 900000;
 
 const formatDate = (value: string | undefined): string => {
   if (!value) return "Unknown time";
