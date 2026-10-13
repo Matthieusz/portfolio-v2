@@ -1,83 +1,33 @@
-import { createMemo, createSignal, onMount, type Component } from "solid-js";
+import { mountAsciiCanvas } from "@/lib/ascii-canvas";
+import * as alpineDawn from "ascii.rest/pieces/alpine-dawn";
+import * as nightCoast from "ascii.rest/pieces/night-coast";
+import * as oceanSunset from "ascii.rest/pieces/ocean-sunset";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  onCleanup,
+  onMount,
+  type Component,
+} from "solid-js";
 
-type TimeOfDay = "night" | "sunrise" | "noon" | "sunset";
+type TimeOfDay = "night" | "sunrise" | "sunset";
 
-const ASCII_ART = {
-  night: `
-  *         *                                *                
-                   *       @@@@@@@@@@@@                *      
-  *      *               @@@@@@@@@@@@@@@@        *          * 
-               *        @@@@@@@@@@@@@@@@@@   *                
-   *                   @@@@@@@@@@@@@@@@@@@@             *     
-       *       *       @@@@@@@@@@@@@@@@@@@@      *            
- *        *             @@@@@@@@@@@@@@@@@@              *     
-     *           *       @@@@@@@@@@@@@@@@       *             
-            *              @@@@@@@@@@@@       *           *   
-   *               *                             *            
-           *                         *                   *    
-~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~  ~~~~~~~
-   *    ~~   ~  ~   *    ~~~~~~~~~~~~~~~~~~~~ ~     *  ~~  *  
-    *  ~~    *  ~~ ~~ ~~ * ~~~~~~~~~~~~~ ~~~~  ~   *  ~~~    *
-`,
-  sunrise: `
-        ~~            ~~        ~~        ~~      ~~       ~~ 
-            ~~           ~~     ~~     ~~              ~~     
-     ~~       ~~~~;         ~~  ~~  ~~           ;~~~~        
-       ~~~;        ~~~~;                   ;~~~~       ;~~~   
- ~~        ~~~~;       ~~~ @@@@@@@@@@@@ ~~~       ;~~~~    ~~ 
-     ~~~        ~~~;     @@@@@@@@@@@@@@@@     ;~~~     ~~~    
-           ~~~      ~~~ @@@@@@@@@@@@@@@@@@ ~~~    ~~~         
-        ^^             @@@@@@@@@@@@@@@@@@@@                   
-__________ ____________&&&&&&&&&&&&&&&&&&&&___________ _______
-        ~~   ~  ~       ~~~~~~~~~~~~~~~~~~~~ ~       ~~     ~~
-  ~   ~~      ~~ ~~ ~~  ~~~~~~~~~~~~~ ~~~~  ~     ~~~    ~ ~~~
-  ~~     ~         ~      ~~~~~~  ~~ ~~~       ~~ ~ ~~  ~~ ~  
- ~       ~ ~      ~           ~~ ~~~~~~  ~      ~~  ~         
-       ~             ~        ~      ~      ~~   ~            
-`,
-  noon: `
-   ^^             ^^                         ^^               
-                           @@@@@@@@@@@@                       
-         ^^              @@@@@@@@@@@@@@@@                 ^^  
- ^^                     @@@@@@@@@@@@@@@@@@           ^^       
-            ^^         @@@@@@@@@@@@@@@@@@@@                   
-                       @@@@@@@@@@@@@@@@@@@@     ^^            
-  ^^                    @@@@@@@@@@@@@@@@@@                ^^  
-                         @@@@@@@@@@@@@@@@                     
-          ^^               @@@@@@@@@@@@              ^^       
-                                                              
-                                                              
-~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~  ~~~~~~~
- ~     *    ~~   ~  ~   *    ~~~~~~~~~~~~~~~~~~~~ ~     *  ~~~
-   ~    *  ~~    *  ~~ ~~ ~~ * ~~~~~~~~~~~~~ ~~~~  ~   *  ~~~ 
-`,
-  sunset: `
-    ^^                  ^^                                    
-                                  ^^                     ^^   
-            ^^                                     ^^         
-                   ^^                                         
-                             @@@@@@@@@        ^^              
-   ^^       ^^            @@@@@@@@@@@@@@@                     
-                        @@@@@@@@@@@@@@@@@@              ^^    
-                       @@@@@@@@@@@@@@@@@@@@                   
-~ ~~ ~~~~~ ~~~~~~~~ ~~ &&&&&&&&&&&&&&&&&&&& ~~~~~~~ ~~~~~~~~~~
-       ~~   ~  ~       ~~~~~~~~~~~~~~~~~~~~ ~       ~~     ~~ 
-      ~~      ~~ ~~ ~~  ~~~~~~~~~~~~~ ~~~~  ~     ~~~    ~ ~~~
-  ~~     ~         ~      ~~~~~~  ~~ ~~~       ~~ ~ ~~  ~~ ~  
-~       ~ ~      ~           ~~ ~~~~~~  ~      ~~  ~          
-   ~             ~        ~      ~      ~~   ~             ~  
-`,
-} satisfies Record<TimeOfDay, string>;
+const SCENES = {
+  night: nightCoast,
+  sunrise: alpineDawn,
+  sunset: oceanSunset,
+} satisfies Record<
+  TimeOfDay,
+  typeof nightCoast | typeof alpineDawn | typeof oceanSunset
+>;
 
 const TIME_RANGES: { start: number; end: number; period: TimeOfDay }[] = [
   { start: 0, end: 6, period: "night" },
-  { start: 6, end: 11, period: "sunrise" },
-  { start: 11, end: 17, period: "noon" },
+  { start: 6, end: 17, period: "sunrise" },
   { start: 17, end: 20, period: "sunset" },
   { start: 20, end: 24, period: "night" },
 ];
-
-const TIME_OF_DAY_ORDER: TimeOfDay[] = ["night", "sunrise", "noon", "sunset"];
 
 const getPoznanTime = (): Date => {
   return new Date(
@@ -91,94 +41,50 @@ const getTimeOfDay = (date: Date): TimeOfDay => {
   return range?.period ?? "night";
 };
 
-const formatPoznanTime = (date: Date): string => {
-  return date.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
-};
-
 const CurrentTimeASCII: Component = () => {
   const [currentTime, setCurrentTime] = createSignal(getPoznanTime());
-  const [manualPeriod, setManualPeriod] = createSignal<TimeOfDay | null>(null);
+
+  let canvas: HTMLCanvasElement | undefined;
 
   onMount(() => {
     const interval = setInterval(() => {
       setCurrentTime(getPoznanTime());
     }, 1000);
-    return () => clearInterval(interval);
+    onCleanup(() => clearInterval(interval));
   });
 
-  const currentPeriod = createMemo(() => {
-    const manual = manualPeriod();
-    if (manual) return manual;
-    return getTimeOfDay(currentTime());
+  const currentPeriod = createMemo(() => getTimeOfDay(currentTime()));
+
+  createEffect(() => {
+    const period = currentPeriod();
+    if (!canvas) return;
+    onCleanup(mountAsciiCanvas(canvas, SCENES[period]));
   });
-
-  const currentArt = createMemo(() => ASCII_ART[currentPeriod()]);
-
-  const cyclePeriod = () => {
-    const current = manualPeriod() ?? getTimeOfDay(currentTime());
-    const currentIndex = TIME_OF_DAY_ORDER.indexOf(current);
-    const nextIndex = (currentIndex + 1) % TIME_OF_DAY_ORDER.length;
-    setManualPeriod(TIME_OF_DAY_ORDER[nextIndex]);
-  };
-
-  const resetToAuto = () => {
-    setManualPeriod(null);
-  };
-
-  const isManual = createMemo(() => manualPeriod() !== null);
 
   return (
-    <div class="font-mono text-sm">
-      <pre class="text-foreground overflow-x-auto text-[10px] leading-tight md:text-xs">
-        {currentArt()}
-      </pre>
-      <div class="text-muted-foreground mt-4 flex items-center justify-center gap-4 text-xs">
-        <span class="text-primary font-semibold">Poznań, Poland</span>
-        {" — "}
-        <span class="text-primary tabular-nums">
-          {formatPoznanTime(currentTime())}
-        </span>
-        <div class="flex gap-2">
-          <button
-            type="button"
-            onClick={cyclePeriod}
-            class="border-border bg-background text-foreground hover:bg-muted flex items-center gap-1 rounded border px-2 py-1 text-xs transition-colors"
-            title="Cycle through times of day"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="icon icon-tabler icons-tabler-outline icon-tabler-rotate"
-            >
-              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-              <path d="M19.95 11a8 8 0 1 0 -.5 4m.5 5v-5h-5" />
-            </svg>
-            {currentPeriod()}
-          </button>
-          {isManual() && (
-            <button
-              type="button"
-              onClick={resetToAuto}
-              class="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground rounded border px-2 py-1 text-xs transition-colors"
-              title="Reset to current time"
-            >
-              reset
-            </button>
-          )}
-        </div>
+    <div class="w-full max-w-[28rem] shrink-0 font-mono text-sm">
+      <div class="flex aspect-[2/1] items-center justify-center overflow-hidden rounded">
+        <canvas
+          ref={(element) => {
+            canvas = element;
+          }}
+          role="img"
+          aria-label={SCENES[currentPeriod()].meta.note}
+          class="text-foreground block w-full"
+        />
       </div>
+      <p class="text-muted-foreground mt-2 text-center text-xs">
+        Art from{" "}
+        <a
+          href="https://ascii.rest/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:text-primary underline underline-offset-4 transition-colors"
+        >
+          ascii.rest
+        </a>{" "}
+        by @bas3line
+      </p>
     </div>
   );
 };
