@@ -1,4 +1,6 @@
 ---
+import PoznanClock from "./PoznanClock";
+
 interface Props {
   lat?: number;
   lng?: number;
@@ -94,6 +96,8 @@ const CARTO_KEY = import.meta.env.CARTO_BASEMAP_API_KEY;
         <circle cx="12" cy="10" r="3"></circle>
       </svg>
       <span>{label}</span>
+      <span aria-hidden="true">—</span>
+      <PoznanClock client:idle />
     </div>
   </div>
 </div>
