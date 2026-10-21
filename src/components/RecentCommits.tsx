@@ -4,12 +4,13 @@ import {
   createSignal,
   For,
   onMount,
+  onCleanup,
   Show,
   Switch,
   Match,
   type Component,
 } from "solid-js";
-import { RecentCommitsData, type RecentCommit } from "../lib/katib-contract";
+import { RecentCommitsData, type RecentCommit } from "../lib/kronik-contract";
 import InfoTooltip from "./InfoTooltip";
 
 const decodeRecentCommitsData = Schema.decodeUnknownPromise(RecentCommitsData);
@@ -58,8 +59,8 @@ const CommitIcon: Component = () => (
     stroke-linecap="round"
     stroke-linejoin="round"
     class="icon icon-tabler icons-tabler-outline icon-tabler-git-commit"
+    aria-hidden="true"
   >
-    <title>Git commit icon</title>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M9 12a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
     <path d="M12 3l0 6" />
@@ -68,56 +69,59 @@ const CommitIcon: Component = () => (
 );
 
 const EmptyState: Component<{ message: string }> = (props) => (
-  <div class="text-muted-foreground flex items-center gap-3">
+  <div
+    role="status"
+    class="text-muted-foreground flex flex-1 items-center justify-center py-8 text-sm"
+  >
     <span>{props.message}</span>
   </div>
 );
 
-const LoadingSkeleton: Component = () => (
-  <div class="flex h-full flex-col justify-center gap-3">
-    {[0, 1, 2, 3, 4].map(() => (
-      <div class="flex flex-col gap-1.5">
-        <div class="flex items-center justify-between">
-          <div class="bg-muted animate-shimmer h-3 w-20 rounded" />
-          <div class="flex items-center gap-1.5">
-            <div class="bg-muted animate-shimmer h-3 w-14 rounded" />
-            <div class="bg-muted animate-shimmer h-3 w-10 rounded" />
-          </div>
-        </div>
-        <div class="flex items-center justify-between">
-          <div class="bg-muted animate-shimmer h-4 w-3/4 rounded" />
-          <div class="bg-muted animate-shimmer h-3 w-16 rounded" />
-        </div>
-      </div>
-    ))}
+const LoadingSpinner: Component = () => (
+  <div
+    role="status"
+    class="text-muted-foreground flex flex-1 items-center justify-center py-8"
+  >
+    <span class="sr-only">Loading recent commits…</span>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      aria-hidden="true"
+      class="size-5 motion-safe:animate-spin"
+    >
+      <path d="M12 3a9 9 0 1 1-9 9" />
+    </svg>
   </div>
 );
 
 const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
-  <div class="flex items-start justify-between gap-4">
-    <div class="w-full min-w-0">
+  <li class="border-border flex min-w-0 flex-col gap-1.5 [border-block-end-width:1px] [padding-block-end:0.75rem] last:[border-block-end-width:0] last:[padding-block-end:0]">
+    <div class="flex min-w-0 flex-col gap-1.5">
       <div class="flex items-center justify-between gap-2">
-        <p class="text-muted-foreground text-xs uppercase">
+        <p
+          title={props.commit.repo}
+          class="text-muted-foreground min-w-0 truncate text-xs"
+        >
           {props.commit.repo}
         </p>
-        <div class="text-muted-foreground flex items-center justify-center gap-1 text-xs">
-          <time datetime={props.commit.date ?? undefined}>
+        <div class="text-muted-foreground shrink-0 text-xs whitespace-nowrap tabular-nums">
+          <time
+            datetime={props.commit.date ?? undefined}
+            title={props.commit.date}
+          >
             {formatDate(props.commit.date)}
           </time>
-          <Show when={props.commit.sha}>
-            {(sha) => (
-              <span class="bg-muted rounded px-1.5 py-0.5 font-mono text-[0.65rem]">
-                {sha().slice(0, 7)}
-              </span>
-            )}
-          </Show>
         </div>
       </div>
-      <div class="mt-1 flex items-center justify-between gap-2">
+      <div class="flex min-w-0 flex-col gap-1.5">
         <Show
           when={props.commit.url}
           fallback={
-            <p class="text-foreground truncate text-sm font-medium">
+            <p class="text-foreground text-sm leading-5 font-medium [overflow-wrap:anywhere]">
               {props.commit.message}
             </p>
           }
@@ -127,41 +131,94 @@ const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
               href={url()}
               target="_blank"
               rel="noopener noreferrer"
-              class="text-foreground hover:text-primary block truncate text-sm font-medium transition-colors"
+              title={props.commit.message}
+              class="text-foreground dark:[@media(hover:hover)_and_(pointer:fine)]:hover:text-primary line-clamp-2 overflow-clip rounded-xs text-sm leading-5 font-medium [overflow-wrap:anywhere] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current active:opacity-75 [@media(hover:hover)_and_(pointer:fine)]:hover:text-[color-mix(in_oklch,var(--primary),var(--foreground)_55%)]"
             >
-              {props.commit.message}
+              <span>{props.commit.message}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                class="ms-0.5 inline-block size-[0.75em] align-super"
+              >
+                <path d="M7 17 17 7M7 7h10v10" />
+              </svg>
             </a>
           )}
         </Show>
-        <Show
-          when={
-            props.commit.additions ||
-            props.commit.deletions ||
-            props.commit.filesChanged
-          }
-        >
-          <div class="text-muted-foreground flex shrink-0 flex-row items-end text-[0.65rem]">
-            <Show when={props.commit.filesChanged}>
-              {(files) => <span>{files()} files</span>}
-            </Show>
-            <Show when={props.commit.additions}>
-              {(additions) => (
-                <span class="text-success text-sm"> +{additions()} </span>
-              )}
-            </Show>
-            <Show when={props.commit.additions && props.commit.deletions}>
-              <span class="ml-1 text-sm">/</span>
-            </Show>
-            <Show when={props.commit.deletions}>
-              {(deletions) => (
-                <span class="text-error text-sm"> -{deletions()} </span>
-              )}
-            </Show>
-          </div>
-        </Show>
+        <div class="text-muted-foreground flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs tabular-nums">
+          <Show when={props.commit.sha}>
+            {(sha) => (
+              <span class="inline-flex items-center gap-1" title={sha()}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  class="h-[1.2cap] w-auto shrink-0"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M3 12h6m6 0h6" />
+                </svg>
+                <code>{sha().slice(0, 7)}</code>
+              </span>
+            )}
+          </Show>
+          <Show
+            when={
+              props.commit.additions ||
+              props.commit.deletions ||
+              props.commit.filesChanged
+            }
+          >
+            <div class="ms-auto flex flex-wrap items-center justify-end gap-2">
+              <Show when={props.commit.filesChanged}>
+                {(files) => (
+                  <span>
+                    {files()} {files() === 1 ? "file" : "files"}
+                  </span>
+                )}
+              </Show>
+              <Show when={props.commit.additions}>
+                {(additions) => (
+                  <span
+                    class="dark:text-success text-green-800"
+                    aria-label={`${additions()} additions`}
+                  >
+                    +{additions()}
+                  </span>
+                )}
+              </Show>
+              <Show when={props.commit.additions && props.commit.deletions}>
+                <span aria-hidden="true" class="text-muted-foreground/60">
+                  /
+                </span>
+              </Show>
+              <Show when={props.commit.deletions}>
+                {(deletions) => (
+                  <span
+                    class="dark:text-error text-rose-800"
+                    aria-label={`${deletions()} deletions`}
+                  >
+                    −{deletions()}
+                  </span>
+                )}
+              </Show>
+            </div>
+          </Show>
+        </div>
       </div>
     </div>
-  </div>
+  </li>
 );
 
 const RecentCommits: Component = () => {
@@ -172,7 +229,7 @@ const RecentCommits: Component = () => {
   const fetchCommits = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/katib/recent-commits");
+      const response = await fetch("/api/kronik/recent-commits");
       if (!response.ok) {
         setErrorMessage("Unable to load commits right now.");
         return;
@@ -191,31 +248,31 @@ const RecentCommits: Component = () => {
   onMount(() => {
     fetchCommits();
     const interval = setInterval(fetchCommits, POLL_INTERVAL);
-    return () => clearInterval(interval);
+    onCleanup(() => clearInterval(interval));
   });
 
   const commits = createMemo(() => data()?.commits ?? []);
 
   return (
-    <div class="bg-card border-border relative flex h-full flex-col gap-3 overflow-hidden rounded-lg border p-4">
+    <div class="bg-card border-border relative flex h-full flex-col gap-4 overflow-clip rounded-lg border p-4">
       <div class="relative z-10">
         <h3 class="text-muted-foreground flex items-center justify-between gap-2 text-xs font-medium tracking-wider uppercase">
-          <div class="flex items-center gap-2">
+          <span class="flex items-center gap-2">
             <CommitIcon />
             Recent Commits
-          </div>
+          </span>
           <InfoTooltip
-            content="Built with Katib API and GitHub data"
+            content="Built with Kronik API and GitHub data"
             size="16"
             color="var(--foreground)"
           />
         </h3>
       </div>
 
-      <div class="relative z-10 flex h-full flex-col gap-3">
+      <div class="relative z-10 flex flex-1 flex-col">
         <Switch>
           <Match when={isLoading()}>
-            <LoadingSkeleton />
+            <LoadingSpinner />
           </Match>
           <Match when={errorMessage()}>
             <EmptyState message="Unable to load commits right now." />
@@ -224,11 +281,11 @@ const RecentCommits: Component = () => {
             <EmptyState message="No commit data available." />
           </Match>
           <Match when={commits().length > 0}>
-            <div class="flex flex-col gap-3">
+            <ul aria-label="Recent commits" class="flex flex-col gap-3">
               <For each={commits().slice(0, 5)}>
                 {(commit) => <CommitRow commit={commit} />}
               </For>
-            </div>
+            </ul>
           </Match>
         </Switch>
       </div>

@@ -7,66 +7,35 @@ interface Props {
 
 const { title, id, compact = true } = Astro.props;
 
-// Catppuccin-inspired gradient pairs [from, to]
-const gradients: [string, string][] = [
-  ["#cba6f7", "#89b4fa"], // mauve → blue
-  ["#89b4fa", "#74c7ec"], // blue → sapphire
-  ["#74c7ec", "#94e2d5"], // sapphire → teal
-  ["#94e2d5", "#a6e3a1"], // teal → green
-  ["#fab387", "#f9e2af"], // peach → yellow
-  ["#f38ba8", "#cba6f7"], // red → mauve
-  ["#a6e3a1", "#89dceb"], // green → sky
-  ["#f5c2e7", "#cba6f7"], // pink → mauve
+// Flat pastel covers retain the site's soft palette without competing with the work.
+const covers = [
+  "oklch(0.8 0.09 255)",
+  "oklch(0.84 0.07 230)",
+  "oklch(0.86 0.07 180)",
+  "oklch(0.86 0.08 145)",
+  "oklch(0.85 0.09 65)",
+  "oklch(0.83 0.08 25)",
+  "oklch(0.88 0.07 110)",
+  "oklch(0.85 0.06 15)",
 ];
 
-// Deterministic hash from title to pick a gradient
 const hash = title.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-const [fromColor, toColor] = gradients[hash % gradients.length]!;
-
-// Get up to 2 initials from words/segments
-const initials = title
-  .split(/[\s\-_]+/)
-  .map((word) => word[0] ?? "")
-  .join("")
-  .slice(0, 2)
-  .toUpperCase();
+const coverColor = covers[hash % covers.length]!;
 ---
 
 <div
   class:list={[
-    "relative flex w-full items-center justify-center overflow-hidden select-none",
-    "transition-transform duration-300 group-hover:scale-[1.05]",
+    "relative flex w-full items-center justify-center overflow-clip select-none",
     compact ? "h-48" : "h-64",
   ]}
-  style={`background: linear-gradient(135deg, ${fromColor}, ${toColor});`}
+  style={`background-color: ${coverColor}; color: oklch(0.28 0.025 255);`}
   transition:name={`project-${id}-image`}
 >
-  <!-- Dot grid texture -->
-  <div
-    class="absolute inset-0"
-    style="background-image: radial-gradient(circle, rgba(30,30,46,0.2) 1px, transparent 1px); background-size: 20px 20px;"
-  ></div>
-
-  <!-- Large faded initials watermark -->
-  <span
-    class="absolute font-mono leading-none font-black"
-    style="font-size: clamp(5rem, 18vw, 9rem); color: rgba(30,30,46,0.08); pointer-events: none;"
-    aria-hidden="true"
-  >
-    {initials}
-  </span>
-
   <!-- Main label -->
   <div class="relative z-10 flex flex-col items-center gap-1.5 px-4 text-center">
     <span
-      class="font-mono text-xs tracking-[0.2em] uppercase"
-      style="color: rgba(30,30,46,0.5);"
-    >
-      ~/projects
-    </span>
-    <span
       class="font-mono font-bold tracking-tight"
-      style={`font-size: ${compact ? "1.125rem" : "1.5rem"}; color: rgba(30,30,46,0.85); line-height: 1.2;`}
+      style={`font-size: ${compact ? "1.125rem" : "1.5rem"}; line-height: 1.2;`}
     >
       {title}
     </span>
