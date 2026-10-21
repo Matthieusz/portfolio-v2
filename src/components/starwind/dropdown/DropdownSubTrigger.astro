@@ -15,11 +15,20 @@ type Props = HTMLAttributes<"div"> & {
   disabled?: boolean;
 };
 
-const { class: className, inset = false, disabled = false, ...rest } = Astro.props;
+const {
+  class: className,
+  inset = false,
+  disabled = false,
+  ...rest
+} = Astro.props;
 ---
 
 <div
-  class={dropdownItem({ inset, disabled, class: ["starwind-dropdown-sub-trigger", className] })}
+  class={dropdownItem({
+    inset,
+    disabled,
+    class: ["starwind-dropdown-sub-trigger", className],
+  })}
   role="menuitem"
   aria-haspopup="true"
   aria-expanded="false"

@@ -5,7 +5,9 @@ import DialogContent, {
   dialogCloseButton,
   dialogContent,
 } from "./DialogContent.astro";
-import DialogDescription, { dialogDescription } from "./DialogDescription.astro";
+import DialogDescription, {
+  dialogDescription,
+} from "./DialogDescription.astro";
 import DialogFooter, { dialogFooter } from "./DialogFooter.astro";
 import DialogHeader, { dialogHeader } from "./DialogHeader.astro";
 import DialogTitle, { dialogTitle } from "./DialogTitle.astro";

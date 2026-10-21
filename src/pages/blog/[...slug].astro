@@ -23,27 +23,21 @@ const { date, description, tags, title } = post.data;
 ---
 
 <MainLayout>
-  <article
-    class="bg-card border-border mx-auto my-12 max-w-4xl overflow-hidden rounded-lg border p-6"
-  >
+  <article class="bg-card border-border mx-auto my-12 max-w-4xl overflow-hidden rounded-lg border p-6">
     <header class="mb-6 space-y-3">
       <h1 class="text-3xl font-bold">{title}</h1>
       <p class="text-muted-foreground">{description}</p>
-      <div
-        class="text-muted-foreground flex flex-wrap items-center gap-3 text-sm"
-      >
-        <time datetime={date.toISOString()}
-          >Publish date: {date.toLocaleDateString("pl-PL")}</time
-        >
+      <div class="text-muted-foreground flex flex-wrap items-center gap-3 text-sm">
+        <time datetime={date.toISOString()}>
+          Publish date: {date.toLocaleDateString("pl-PL")}
+        </time>
       </div>
       <div class="flex flex-wrap gap-2">
-        {
-          tags.map((tag) => (
-            <span class="bg-secondary text-secondary-foreground rounded-lg px-3 py-1 text-sm">
-              {tag}
-            </span>
-          ))
-        }
+        {tags.map((tag) => (
+          <span class="bg-secondary text-secondary-foreground rounded-lg px-3 py-1 text-sm">
+            {tag}
+          </span>
+        ))}
       </div>
     </header>
 

@@ -9,6 +9,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest run",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "prepare": "effect-language-service patch",
@@ -35,15 +37,14 @@
     "typescript": "^6.0.3"
   },
   "devDependencies": {
+    "@astrojs/compiler-rs": "^0.5.2",
     "@effect/language-service": "^0.87.5",
     "@effect/vitest": "^4.0.5",
     "@oxlint/plugins": "1.80.0",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^26.6.5",
+    "oxfmt": "^0.74.0",
     "oxlint": "1.80.0",
-    "prettier": "^3.9.10",
-    "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-tailwindcss": "^0.8.1",
     "vitest": "^4.1.12"
   }
 }

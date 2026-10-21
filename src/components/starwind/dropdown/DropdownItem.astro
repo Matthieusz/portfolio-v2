@@ -33,7 +33,13 @@ export const dropdownItem = tv({
   },
 });
 
-const { class: className, inset = false, disabled = false, as: Tag = "div", ...rest } = Astro.props;
+const {
+  class: className,
+  inset = false,
+  disabled = false,
+  as: Tag = "div",
+  ...rest
+} = Astro.props;
 ---
 
 <Tag

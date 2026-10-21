@@ -64,7 +64,9 @@ const { class: className, ...rest } = Astro.props;
       }
 
       // Find internal triggers and handle them
-      const internalTriggers = dialogWrapper.querySelectorAll(".starwind-dialog-trigger");
+      const internalTriggers = dialogWrapper.querySelectorAll(
+        ".starwind-dialog-trigger",
+      );
       internalTriggers.forEach((triggerElement) => {
         const trigger = triggerElement.hasAttribute("data-as-child")
           ? triggerElement.firstElementChild
@@ -83,7 +85,10 @@ const { class: className, ...rest } = Astro.props;
         ".starwind-dialog-close",
       );
       tempCloseButtons.forEach((button) => {
-        if (button instanceof HTMLElement && button.hasAttribute("data-as-child")) {
+        if (
+          button instanceof HTMLElement &&
+          button.hasAttribute("data-as-child")
+        ) {
           const childElement = button.firstElementChild;
           if (childElement) {
             childElement.classList.add("starwind-dialog-close");
@@ -96,7 +101,9 @@ const { class: className, ...rest } = Astro.props;
       // Convert NodeList to Array for consistency with triggers
       this.closeButtons = Array.from(
         dialogWrapper.querySelectorAll(".starwind-dialog-close"),
-      ).filter((button): button is HTMLElement => button instanceof HTMLElement);
+      ).filter(
+        (button): button is HTMLElement => button instanceof HTMLElement,
+      );
 
       // if essential elements are not there, exit
       if (!this.dialog || !this.backdrop) return;
@@ -135,7 +142,10 @@ const { class: className, ...rest } = Astro.props;
           ? triggerElement.firstElementChild
           : triggerElement;
 
-        if (trigger instanceof HTMLElement && !this.triggers.includes(trigger)) {
+        if (
+          trigger instanceof HTMLElement &&
+          !this.triggers.includes(trigger)
+        ) {
           this.triggers.push(trigger);
         }
       });
@@ -167,7 +177,10 @@ const { class: className, ...rest } = Astro.props;
         button.addEventListener("click", () => {
           // Only close if this is the topmost dialog
           const openDialogs = document.querySelectorAll("dialog[open]");
-          if (openDialogs.length > 0 && openDialogs[openDialogs.length - 1] === this.dialog) {
+          if (
+            openDialogs.length > 0 &&
+            openDialogs[openDialogs.length - 1] === this.dialog
+          ) {
             this.close();
           }
         });
@@ -186,7 +199,10 @@ const { class: className, ...rest } = Astro.props;
         if (!clickedInDialog) {
           // Only close if this is the topmost dialog
           const openDialogs = document.querySelectorAll("dialog[open]");
-          if (openDialogs.length > 0 && openDialogs[openDialogs.length - 1] === this.dialog) {
+          if (
+            openDialogs.length > 0 &&
+            openDialogs[openDialogs.length - 1] === this.dialog
+          ) {
             this.close();
           }
         }
@@ -199,7 +215,10 @@ const { class: className, ...rest } = Astro.props;
           e.preventDefault();
           // Only close if this is the topmost dialog
           const openDialogs = document.querySelectorAll("dialog[open]");
-          if (openDialogs.length > 0 && openDialogs[openDialogs.length - 1] === this.dialog) {
+          if (
+            openDialogs.length > 0 &&
+            openDialogs[openDialogs.length - 1] === this.dialog
+          ) {
             this.close();
           }
         }
@@ -220,7 +239,10 @@ const { class: className, ...rest } = Astro.props;
             e.preventDefault();
             // Only close if this is the topmost dialog
             const openDialogs = document.querySelectorAll("dialog[open]");
-            if (openDialogs.length > 0 && openDialogs[openDialogs.length - 1] === this.dialog) {
+            if (
+              openDialogs.length > 0 &&
+              openDialogs[openDialogs.length - 1] === this.dialog
+            ) {
               this.close();
             }
           }
@@ -327,7 +349,10 @@ const { class: className, ...rest } = Astro.props;
 
       if (this.nestedOpenCount > 0) {
         this.dialog.setAttribute("data-nested-dialog-open", "");
-        this.dialog.style.setProperty("--nested-dialogs", String(this.nestedOpenCount));
+        this.dialog.style.setProperty(
+          "--nested-dialogs",
+          String(this.nestedOpenCount),
+        );
       } else {
         this.dialog.removeAttribute("data-nested-dialog-open");
         this.dialog.style.removeProperty("--nested-dialogs");
@@ -338,7 +363,8 @@ const { class: className, ...rest } = Astro.props;
      * Links this dialog to its parent dialog (called after all dialogs are initialized)
      */
     public linkParentDialog(): void {
-      const parentDialogWrapper = this.dialogWrapper.parentElement?.closest(".starwind-dialog");
+      const parentDialogWrapper =
+        this.dialogWrapper.parentElement?.closest(".starwind-dialog");
       if (parentDialogWrapper) {
         this.isNested = true;
         const parentInstance =
@@ -359,7 +385,10 @@ const { class: className, ...rest } = Astro.props;
       if (!(dialogWrapper instanceof HTMLElement)) return;
       const wrapper = dialogWrapper;
       if (!dialogInstances.has(wrapper)) {
-        dialogInstances.set(wrapper, new DialogHandler(wrapper, dialogCounter++));
+        dialogInstances.set(
+          wrapper,
+          new DialogHandler(wrapper, dialogCounter++),
+        );
       }
     });
 

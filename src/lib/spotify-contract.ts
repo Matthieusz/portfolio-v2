@@ -25,8 +25,9 @@ export const NowPlayingData = Schema.Struct({
 });
 
 /** Spotify now-playing data, including adjacent tracks when available. */
-export interface NowPlayingData
-  extends Schema.Schema.Type<typeof NowPlayingData> {}
+export interface NowPlayingData extends Schema.Schema.Type<
+  typeof NowPlayingData
+> {}
 
 /** Decodes the nullable response returned by the Spotify API route. */
 export const NowPlayingResponse = Schema.NullOr(NowPlayingData);

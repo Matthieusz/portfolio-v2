@@ -23,30 +23,30 @@ for (const segment of segments) {
 ---
 
 <nav aria-label="Breadcrumb" class="flex items-center gap-1 text-lg font-bold">
-  {
-    breadcrumbs.map((crumb, index) => (
-      <>
-        {index > 0 && (
-          <span class="text-muted-foreground select-none" aria-hidden="true">
-            /
-          </span>
-        )}
-        {index === breadcrumbs.length - 1 ? (
-          <span class="text-primary font-medium" aria-current="page">
-            {crumb.label}
-          </span>
-        ) : (
-          <a
-            href={crumb.href}
-            class="text-muted-foreground hover:text-primary transition-colors duration-200"
-          >
-            {crumb.label}
-          </a>
-        )}
-      </>
-    ))
-  }
-  <span class="text-muted-foreground select-none" aria-hidden="true">/</span>
+  {breadcrumbs.map((crumb, index) => (
+    <>
+      {index > 0 && (
+        <span class="text-muted-foreground select-none" aria-hidden="true">
+          /
+        </span>
+      )}
+      {index === breadcrumbs.length - 1 ? (
+        <span class="text-primary font-medium" aria-current="page">
+          {crumb.label}
+        </span>
+      ) : (
+        <a
+          href={crumb.href}
+          class="text-muted-foreground hover:text-primary transition-colors duration-200"
+        >
+          {crumb.label}
+        </a>
+      )}
+    </>
+  ))}
+  <span class="text-muted-foreground select-none" aria-hidden="true">
+    /
+  </span>
   <span class="bg-primary animate-blink h-4 w-2" aria-hidden="true"></span>
 </nav>
 

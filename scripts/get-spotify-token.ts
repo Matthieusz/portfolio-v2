@@ -128,7 +128,9 @@ const waitForAuthorizationCode = (
     server.listen(CALLBACK_PORT, CALLBACK_HOST, () => {
       console.log("\n🎵 Spotify Refresh Token Generator\n");
       console.log("Opening Spotify authorization in your browser...");
-      console.log(`If it does not open, visit this URL manually:\n\n${authUrl}`);
+      console.log(
+        `If it does not open, visit this URL manually:\n\n${authUrl}`,
+      );
       console.log("\nWaiting for authorization callback...\n");
       openBrowser(authUrl);
     });

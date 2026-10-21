@@ -45,37 +45,31 @@ const socialLinks = [
     </div>
 
     <div class="mt-8 w-full">
-      <h2
-        class="text-muted-foreground mb-4 text-sm font-medium tracking-wider uppercase"
-      >
+      <h2 class="text-muted-foreground mb-4 text-sm font-medium tracking-wider uppercase">
         Connect with me
       </h2>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {
-          socialLinks.map((social) => (
-            <a
-              href={social.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="bg-card border-border group hover:border-primary/50 flex items-center gap-4 rounded-lg border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-            >
-              <div class="bg-muted group-hover:bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg transition-colors">
-                <social.icon size={24} color="currentColor" />
-              </div>
-              <div class="flex flex-col">
-                <span class="text-foreground font-semibold">{social.name}</span>
-                <span class="text-muted-foreground text-sm">
-                  {social.description}
-                </span>
-              </div>
-            </a>
-          ))
-        }
+        {socialLinks.map((social) => (
+          <a
+            href={social.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="bg-card border-border group hover:border-primary/50 flex items-center gap-4 rounded-lg border p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+          >
+            <div class="bg-muted group-hover:bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg transition-colors">
+              <social.icon size={24} color="currentColor" />
+            </div>
+            <div class="flex flex-col">
+              <span class="text-foreground font-semibold">{social.name}</span>
+              <span class="text-muted-foreground text-sm">
+                {social.description}
+              </span>
+            </div>
+          </a>
+        ))}
       </div>
 
-      <div
-        class="mt-6 flex flex-col items-center justify-center gap-2 text-sm sm:flex-row"
-      >
+      <div class="mt-6 flex flex-col items-center justify-center gap-2 text-sm sm:flex-row">
         <span class="text-muted-foreground">or send me an email at</span>
         <a
           href="mailto:mateusz.irski@gmail.com"

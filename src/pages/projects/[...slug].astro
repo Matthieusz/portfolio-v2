@@ -90,42 +90,36 @@ const hasImages = imageEntries.length > 0;
         </h1>
         <div class="flex flex-wrap items-center gap-3 text-sm">
           <time datetime={date.toISOString()}>{date.toLocaleDateString()}</time>
-          {
-            repoLink ? (
-              <a
-                class="link-underline flex items-center gap-1"
-                href={repoLink}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <Github size={16} color="currentColor" />
-                Repository
-              </a>
-            ) : null
-          }
-          {
-            demoLink ? (
-              <a
-                class="link-underline flex items-center gap-1"
-                href={demoLink}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <Link size={16} color="currentColor" />
-                Live demo
-              </a>
-            ) : null
-          }
+          {repoLink ? (
+            <a
+              class="link-underline flex items-center gap-1"
+              href={repoLink}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <Github size={16} color="currentColor" />
+              Repository
+            </a>
+          ) : null}
+          {demoLink ? (
+            <a
+              class="link-underline flex items-center gap-1"
+              href={demoLink}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <Link size={16} color="currentColor" />
+              Live demo
+            </a>
+          ) : null}
           {hasImages && <Gallery images={imageEntries} client:load />}
         </div>
         <div class="flex flex-wrap gap-2">
-          {
-            tags.map((tag) => (
-              <span class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs">
-                {tag}
-              </span>
-            ))
-          }
+          {tags.map((tag) => (
+            <span class="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs">
+              {tag}
+            </span>
+          ))}
         </div>
       </header>
 

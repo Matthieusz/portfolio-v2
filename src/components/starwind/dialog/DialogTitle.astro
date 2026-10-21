@@ -17,6 +17,10 @@ export const dialogTitle = tv({
 const { class: className, ...rest } = Astro.props;
 ---
 
-<h2 class={dialogTitle({ class: className })} {...rest} data-slot="dialog-title">
+<h2
+  class={dialogTitle({ class: className })}
+  {...rest}
+  data-slot="dialog-title"
+>
   <slot />
 </h2>

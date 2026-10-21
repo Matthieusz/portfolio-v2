@@ -15,9 +15,8 @@ import {
 } from "../lib/spotify-contract";
 import InfoTooltip from "./InfoTooltip";
 
-const decodeNowPlayingResponse = Schema.decodeUnknownPromise(
-  NowPlayingResponse,
-);
+const decodeNowPlayingResponse =
+  Schema.decodeUnknownPromise(NowPlayingResponse);
 const POLL_INTERVAL = 10000;
 const PROGRESS_UPDATE_INTERVAL = 1000;
 

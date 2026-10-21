@@ -28,10 +28,10 @@ It has the usual portfolio ingredients — projects, an about page, and a small 
 
 ## Selected work
 
-| Project | What it does | Links |
-| --- | --- | --- |
-| **[Labsync](https://labsync.informati.dev)** | Keeps lab-group chat, deadlines, files, and access in one place. | [repo](https://github.com/Matthieusz/labsync) · [demo](https://labsync.informati.dev) |
-| **[Tepirek Revamped](https://gz.informati.dev)** | A purpose-built control room for running a Margonem clan. | [repo](https://github.com/Matthieusz/tepirek-revamped) · [demo](https://gz.informati.dev) |
+| Project                                                  | What it does                                                     | Links                                                                                             |
+| -------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **[Labsync](https://labsync.informati.dev)**             | Keeps lab-group chat, deadlines, files, and access in one place. | [repo](https://github.com/Matthieusz/labsync) · [demo](https://labsync.informati.dev)             |
+| **[Tepirek Revamped](https://gz.informati.dev)**         | A purpose-built control room for running a Margonem clan.        | [repo](https://github.com/Matthieusz/tepirek-revamped) · [demo](https://gz.informati.dev)         |
 | **[Squad Builder](https://squad-builder.informati.dev)** | Builds and shares Margonem squads without accounts or a backend. | [repo](https://github.com/Matthieusz/squad-builder) · [demo](https://squad-builder.informati.dev) |
 
 More detail, screenshots, and the full project list are available on the [website](https://informati.dev/projects).

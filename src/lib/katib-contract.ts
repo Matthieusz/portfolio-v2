@@ -13,8 +13,7 @@ export const RecentCommit = Schema.Struct({
 });
 
 /** A normalized commit rendered by the recent-commits UI. */
-export interface RecentCommit
-  extends Schema.Schema.Type<typeof RecentCommit> {}
+export interface RecentCommit extends Schema.Schema.Type<typeof RecentCommit> {}
 
 /** Decodes the normalized result returned by the Katib API route. */
 export const RecentCommitsData = Schema.Struct({
@@ -23,5 +22,6 @@ export const RecentCommitsData = Schema.Struct({
 });
 
 /** The normalized recent-commits result returned to the browser. */
-export interface RecentCommitsData
-  extends Schema.Schema.Type<typeof RecentCommitsData> {}
+export interface RecentCommitsData extends Schema.Schema.Type<
+  typeof RecentCommitsData
+> {}

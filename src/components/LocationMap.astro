@@ -27,9 +27,7 @@ const CARTO_KEY = import.meta.env.CARTO_BASEMAP_API_KEY;
   data-label={label}
   data-carto-key={CARTO_KEY}
 >
-  <h3
-    class="text-muted-foreground mb-3 flex items-center justify-between gap-2 px-2 pt-2 text-xs font-medium tracking-wider uppercase"
-  >
+  <h3 class="text-muted-foreground mb-3 flex items-center justify-between gap-2 px-2 pt-2 text-xs font-medium tracking-wider uppercase">
     <span class="flex items-center gap-2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -42,11 +40,11 @@ const CARTO_KEY = import.meta.env.CARTO_BASEMAP_API_KEY;
         stroke-linecap="round"
         stroke-linejoin="round"
         class="icon icon-tabler icons-tabler-outline icon-tabler-map-pin"
-        ><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path
-          d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path><path
-          d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0"
-        ></path></svg
       >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+        <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0"></path>
+      </svg>
       Currently based in
     </span>
     <span class="group relative inline-flex items-center">
@@ -68,18 +66,14 @@ const CARTO_KEY = import.meta.env.CARTO_BASEMAP_API_KEY;
         <path d="M12 9h.01"></path>
         <path d="M11 12h1v4h1"></path>
       </svg>
-      <span
-        class="bg-background text-foreground pointer-events-none absolute top-1/2 right-full z-10 mr-2 -translate-y-1/2 rounded px-2 py-1 text-[0.65rem] whitespace-nowrap opacity-0 shadow transition-opacity duration-150 group-hover:opacity-100"
-      >
+      <span class="bg-background text-foreground pointer-events-none absolute top-1/2 right-full z-10 mr-2 -translate-y-1/2 rounded px-2 py-1 text-[0.65rem] whitespace-nowrap opacity-0 shadow transition-opacity duration-150 group-hover:opacity-100">
         Built with Leaflet
       </span>
     </span>
   </h3>
   <div id="map" class="h-full w-full flex-1 rounded-md"></div>
   <div class="pointer-events-none absolute bottom-2 left-2 z-1000">
-    <div
-      class="bg-card/80 text-foreground flex items-center gap-2 rounded-md px-2 py-1 text-xs"
-    >
+    <div class="bg-card/80 text-foreground flex items-center gap-2 rounded-md px-2 py-1 text-xs">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="14"

@@ -9,4 +9,3 @@ tags:
 I've always wanted to output something cool, but lack of ideas held me back. I hope now that I have a dedicated blog section on my site, that will motivate me :)
 
 For now, lets give it for lorem ipsum!
-

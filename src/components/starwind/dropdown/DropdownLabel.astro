@@ -24,6 +24,10 @@ export const dropdownLabel = tv({
 const { class: className, inset = false, ...rest } = Astro.props;
 ---
 
-<div class={dropdownLabel({ inset, class: className })} {...rest} data-slot="dropdown-label">
+<div
+  class={dropdownLabel({ inset, class: className })}
+  {...rest}
+  data-slot="dropdown-label"
+>
   <slot />
 </div>
