@@ -1,9 +1,9 @@
 import type { APIRoute } from "astro";
 import { Effect, Exit, Layer, Option } from "effect";
-import { Katib, type KatibError } from "@/lib/katib";
+import { Kronik, type KronikError } from "@/lib/kronik";
 import { runtimeConfigLayer } from "@/lib/runtime-config";
 
-/** Prevents the live Katib endpoint from being prerendered. */
+/** Prevents the live Kronik endpoint from being prerendered. */
 export const prerender = false;
 
 const DEFAULT_LIMIT = 5;
@@ -13,15 +13,15 @@ const headers = {
   "Cache-Control": "no-cache, no-store, must-revalidate",
 };
 
-const KatibLive = Katib.layer.pipe(Layer.provide(runtimeConfigLayer));
+const KronikLive = Kronik.layer.pipe(Layer.provide(runtimeConfigLayer));
 
-const statusForError = (error: KatibError): number => {
+const statusForError = (error: KronikError): number => {
   switch (error._tag) {
-    case "KatibConfigurationError":
+    case "KronikConfigurationError":
       return 500;
-    case "KatibTransportError":
-    case "KatibResponseError":
-    case "KatibDecodeError":
+    case "KronikTransportError":
+    case "KronikResponseError":
+    case "KronikDecodeError":
       return 502;
   }
 };
@@ -31,13 +31,15 @@ export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   const requestedLimit = Number(url.searchParams.get("limit") ?? DEFAULT_LIMIT);
   const limit =
-    Number.isFinite(requestedLimit) && requestedLimit > 0
+    Number.isInteger(requestedLimit) &&
+    requestedLimit >= 1 &&
+    requestedLimit <= 100
       ? requestedLimit
       : DEFAULT_LIMIT;
 
   const exit = await Effect.runPromiseExit(
-    Katib.use((katib) => katib.recentCommits(limit)).pipe(
-      Effect.provide(KatibLive),
+    Kronik.use((kronik) => kronik.recentCommits(limit)).pipe(
+      Effect.provide(KronikLive),
     ),
   );
 

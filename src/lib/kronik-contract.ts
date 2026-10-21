@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-/** Decodes a normalized commit returned by the Katib API route. */
+/** Decodes a normalized commit returned by the Kronik API route. */
 export const RecentCommit = Schema.Struct({
   message: Schema.String,
   repo: Schema.String,
@@ -15,7 +15,7 @@ export const RecentCommit = Schema.Struct({
 /** A normalized commit rendered by the recent-commits UI. */
 export interface RecentCommit extends Schema.Schema.Type<typeof RecentCommit> {}
 
-/** Decodes the normalized result returned by the Katib API route. */
+/** Decodes the normalized result returned by the Kronik API route. */
 export const RecentCommitsData = Schema.Struct({
   commits: Schema.Array(RecentCommit),
   totalCommits: Schema.optional(Schema.Finite),
