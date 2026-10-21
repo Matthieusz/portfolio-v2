@@ -17,9 +17,9 @@
     "typecheck": "astro check"
   },
   "dependencies": {
-    "@astrojs/check": "0.9.10",
+    "@astrojs/check": "0.9.11",
     "@astrojs/node": "^11.1.9",
-    "@astrojs/sitemap": "3.7.3",
+    "@astrojs/sitemap": "3.7.4",
     "@astrojs/solid-js": "^7.1.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@tabler/icons": "^3.49.0",
@@ -40,11 +40,11 @@
     "@astrojs/compiler-rs": "^0.5.2",
     "@effect/language-service": "^0.87.5",
     "@effect/vitest": "^4.0.5",
-    "@oxlint/plugins": "1.80.0",
+    "@oxlint/plugins": "1.89.0",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^26.6.5",
     "oxfmt": "^0.74.0",
-    "oxlint": "1.80.0",
-    "vitest": "^4.1.12"
+    "oxlint": "1.89.0",
+    "vitest": "^5.0.5"
   }
 }
