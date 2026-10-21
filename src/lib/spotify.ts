@@ -4,7 +4,7 @@ import {
   HttpClient,
   HttpClientRequest,
   HttpClientResponse,
-} from "effect/unstable/http";
+} from "effect/http";
 import type { NowPlayingData, TrackInfo } from "./spotify-contract";
 
 const TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token";
@@ -116,9 +116,9 @@ export class SpotifyConfiguration extends Context.Service<
   static readonly layer = Layer.effect(
     SpotifyConfiguration,
     Effect.gen(function* () {
-      const clientId = yield* Config.redacted("SPOTIFY_CLIENT_ID");
-      const clientSecret = yield* Config.redacted("SPOTIFY_CLIENT_SECRET");
-      const refreshToken = yield* Config.redacted("SPOTIFY_REFRESH_TOKEN");
+      const clientId = yield* Config.Redacted("SPOTIFY_CLIENT_ID");
+      const clientSecret = yield* Config.Redacted("SPOTIFY_CLIENT_SECRET");
+      const refreshToken = yield* Config.Redacted("SPOTIFY_REFRESH_TOKEN");
 
       return SpotifyConfiguration.of({
         clientId,

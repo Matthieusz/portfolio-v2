@@ -12,7 +12,7 @@ import {
   HttpClient,
   HttpClientRequest,
   HttpClientResponse,
-} from "effect/unstable/http";
+} from "effect/http";
 import type { RecentCommit, RecentCommitsData } from "./katib-contract";
 
 const KATIB_ENDPOINT = "https://katib.jasoncameron.dev/v2/commits/latest";
@@ -165,10 +165,10 @@ export class KatibConfiguration extends Context.Service<
   static readonly layer = Layer.effect(
     KatibConfiguration,
     Effect.gen(function* () {
-      const username = yield* Config.string("GITHUB_USERNAME").pipe(
+      const username = yield* Config.String("GITHUB_USERNAME").pipe(
         Config.withDefault("Matthieusz"),
       );
-      const githubToken = yield* Config.option(Config.redacted("GITHUB_TOKEN"));
+      const githubToken = yield* Config.option(Config.Redacted("GITHUB_TOKEN"));
       return KatibConfiguration.of({ username, githubToken });
     }).pipe(Effect.mapError((cause) => new KatibConfigurationError({ cause }))),
   );
