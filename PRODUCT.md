@@ -41,7 +41,7 @@ Visitors can browse selected projects and project details, read the blog, learn 
 - `src/content/`: existing project and blog content and image assets.
 - `src/pages/about.astro`: biography, portrait reference, and contact information.
 - `src/components/Hero.astro`: existing introduction and professional profile links.
-- Existing selected work includes Labsync, Tepirek Revamped, and Squad Builder, with repository and live-demo links documented in the README.
+- Existing selected work includes Labsync, Tepirek Revamped, and Kronik, with project links documented in the README.
 - Future work must use existing evidence or owner-provided facts rather than invent testimonials, impact metrics, or professional claims.
 
 ## Product Principles
