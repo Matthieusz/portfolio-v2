@@ -80,15 +80,15 @@ const featuredProjects = (
                   Repository
                 </a>
               ) : null}
-              {project.data.demoLink ? (
+              {project.data.siteLink ? (
                 <a
                   class="link-underline flex items-center gap-1"
-                  href={project.data.demoLink}
+                  href={project.data.siteLink}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
                   <Link size={16} color="currentColor" />
-                  Live demo
+                  Website
                 </a>
               ) : null}
             </div>

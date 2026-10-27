@@ -13,7 +13,6 @@ tags:
   - docker
 featured: true
 repoLink: https://github.com/Matthieusz/labsync
-demoLink: https://labsync.informati.dev
 ---
 
 Labsync puts the moving parts of a university lab group in one place: messages, dates, files, and people.

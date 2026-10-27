@@ -28,7 +28,7 @@ if (!project) {
 }
 
 const { Content } = await render(project);
-const { date, demoLink, repoLink, tags, title } = project.data;
+const { date, siteLink, repoLink, tags, title } = project.data;
 
 const projectDir = project.id.split("/")[0];
 
@@ -101,15 +101,15 @@ const hasImages = imageEntries.length > 0;
               Repository
             </a>
           ) : null}
-          {demoLink ? (
+          {siteLink ? (
             <a
               class="link-underline flex items-center gap-1"
-              href={demoLink}
+              href={siteLink}
               rel="noopener noreferrer"
               target="_blank"
             >
               <Link size={16} color="currentColor" />
-              Live demo
+              Website
             </a>
           ) : null}
           {hasImages && <Gallery images={imageEntries} client:load />}
