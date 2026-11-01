@@ -33,11 +33,7 @@ const featuredProjects = (
             href={`/projects/${slugify(project.data.title)}`}
             class="group block"
           >
-            <ProjectBanner
-              title={project.data.title}
-              id={project.id}
-              compact={true}
-            />
+            <ProjectBanner title={project.data.title} compact={true} />
           </a>
           <div class="flex flex-1 flex-col gap-4 p-4">
             <div class="space-y-2">
@@ -46,10 +42,7 @@ const featuredProjects = (
                   {project.data.date.toLocaleDateString()}
                 </time>
               </div>
-              <h3
-                class="text-lg font-semibold"
-                transition:name={`project-${project.id}-title`}
-              >
+              <h3 class="text-lg font-semibold">
                 <a
                   href={`/projects/${slugify(project.data.title)}`}
                   class="hover:text-primary"

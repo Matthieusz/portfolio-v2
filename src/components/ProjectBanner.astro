@@ -1,11 +1,10 @@
 ---
 interface Props {
   title: string;
-  id: string;
   compact?: boolean;
 }
 
-const { title, id, compact = true } = Astro.props;
+const { title, compact = true } = Astro.props;
 
 // Flat pastel covers retain the site's soft palette without competing with the work.
 const covers = [
@@ -29,7 +28,6 @@ const coverColor = covers[hash % covers.length]!;
     compact ? "h-48" : "h-64",
   ]}
   style={`background-color: ${coverColor}; color: oklch(0.28 0.025 255);`}
-  transition:name={`project-${id}-image`}
 >
   <!-- Main label -->
   <div class="relative z-10 flex flex-col items-center gap-1.5 px-4 text-center">
