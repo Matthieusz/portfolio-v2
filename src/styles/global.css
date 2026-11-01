@@ -231,19 +231,20 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*) {
-    animation-duration: 1ms;
+:root {
+  --page-transition-duration: 1ms;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --page-transition-duration: 160ms;
   }
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 160ms;
-  animation-timing-function: ease-out;
-}
-
-::view-transition-group(*) {
-  animation-duration: 160ms;
-  animation-timing-function: ease-out;
+/* Override Astro's scoped animation shorthands so fades and movement stay in sync. */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: var(--page-transition-duration) !important;
+  animation-timing-function: ease-out !important;
 }
