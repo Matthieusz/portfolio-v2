@@ -28,11 +28,11 @@ It has the usual portfolio ingredients — projects, an about page, and a small 
 
 ## Selected work
 
-| Project                                                  | What it does                                                     | Links                                                                                             |
-| -------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| **Labsync** | Keeps lab-group chat, deadlines, files, and access in one place. | [repo](https://github.com/Matthieusz/labsync) |
-| **[Tepirek Revamped](https://gz.informati.dev)** | A purpose-built control room for running a Margonem clan. | [repo](https://github.com/Matthieusz/tepirek-revamped) · [website](https://gz.informati.dev) |
-| **Kronik** | Turns public GitHub activity into portfolio-friendly summaries. | [repo](https://github.com/Matthieusz/kronik) · [docs](https://kronik.informati.dev) |
+| Project                                          | What it does                                                     | Links                                                                                        |
+| ------------------------------------------------ | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **Labsync**                                      | Keeps lab-group chat, deadlines, files, and access in one place. | [repo](https://github.com/Matthieusz/labsync)                                                |
+| **[Tepirek Revamped](https://gz.informati.dev)** | A purpose-built control room for running a Margonem clan.        | [repo](https://github.com/Matthieusz/tepirek-revamped) · [website](https://gz.informati.dev) |
+| **Kronik**                                       | Turns public GitHub activity into portfolio-friendly summaries.  | [repo](https://github.com/Matthieusz/kronik) · [docs](https://kronik.informati.dev)          |
 
 More detail, screenshots, and the full project list are available on the [website](https://informati.dev/projects).
 
