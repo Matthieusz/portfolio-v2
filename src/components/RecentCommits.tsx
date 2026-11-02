@@ -10,11 +10,28 @@ import {
   Match,
   type Component,
 } from "solid-js";
-import { RecentCommitsData, type RecentCommit } from "../lib/kronik-contract";
+import {
+  ActivitySummary,
+  ContributionStreak,
+  RecentCommitsData,
+  type RecentCommit,
+} from "../lib/kronik-contract";
 import InfoTooltip from "./InfoTooltip";
 
 const decodeRecentCommitsData = Schema.decodeUnknownPromise(RecentCommitsData);
+const decodeActivity = Schema.decodeUnknownPromise(ActivitySummary);
+const decodeStreak = Schema.decodeUnknownPromise(ContributionStreak);
 const POLL_INTERVAL = 900000;
+const LANGUAGE_COLORS = [
+  "#16a6c4",
+  "#df583c",
+  "#367bb5",
+  "#f06535",
+  "#87c95b",
+  "#a779c6",
+  "#f0c75e",
+  "#74c6cf",
+];
 
 const formatDate = (value: string | undefined): string => {
   if (!value) return "Unknown time";
@@ -99,8 +116,8 @@ const LoadingSpinner: Component = () => (
 );
 
 const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
-  <li class="border-border flex min-w-0 flex-col gap-1.5 [border-block-end-width:1px] [padding-block-end:0.75rem] last:[border-block-end-width:0] last:[padding-block-end:0]">
-    <div class="flex min-w-0 flex-col gap-1.5">
+  <li class="border-border flex min-w-0 flex-col gap-1 [border-block-end-width:1px] [padding-block-end:0.5rem] last:[border-block-end-width:0] last:[padding-block-end:0]">
+    <div class="flex min-w-0 flex-col gap-1">
       <div class="flex items-center justify-between gap-2">
         <p
           title={props.commit.repo}
@@ -117,7 +134,7 @@ const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
           </time>
         </div>
       </div>
-      <div class="flex min-w-0 flex-col gap-1.5">
+      <div class="flex min-w-0 flex-col gap-1">
         <Show
           when={props.commit.url}
           fallback={
@@ -177,16 +194,15 @@ const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
             when={
               props.commit.additions ||
               props.commit.deletions ||
-              props.commit.filesChanged
+              props.commit.filesChanged !== undefined
             }
           >
             <div class="ms-auto flex flex-wrap items-center justify-end gap-2">
-              <Show when={props.commit.filesChanged}>
-                {(files) => (
-                  <span>
-                    {files()} {files() === 1 ? "file" : "files"}
-                  </span>
-                )}
+              <Show when={props.commit.filesChanged !== undefined}>
+                <span>
+                  {props.commit.filesChanged}{" "}
+                  {props.commit.filesChanged === 1 ? "file" : "files"}
+                </span>
               </Show>
               <Show when={props.commit.additions}>
                 {(additions) => (
@@ -222,6 +238,9 @@ const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
 );
 
 const RecentCommits: Component = () => {
+  const [activity, setActivity] = createSignal<ActivitySummary | null>(null);
+  const [activityUnavailable, setActivityUnavailable] = createSignal(false);
+  const [streak, setStreak] = createSignal<ContributionStreak | null>(null);
   const [data, setData] = createSignal<RecentCommitsData | null>(null);
   const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
   const [isLoading, setIsLoading] = createSignal(true);
@@ -245,9 +264,38 @@ const RecentCommits: Component = () => {
     }
   };
 
+  const fetchStreak = async () => {
+    try {
+      const response = await fetch("/api/kronik/streak");
+      if (!response.ok) return;
+      const payload: unknown = await response.json();
+      setStreak(await decodeStreak(payload));
+    } catch {
+      // The commit list remains useful when the streak endpoint is unavailable.
+    }
+  };
+
+  const fetchActivity = async () => {
+    try {
+      const response = await fetch("/api/kronik/activity");
+      if (!response.ok) throw new Error("Activity unavailable");
+      const payload: unknown = await response.json();
+      setActivity(await decodeActivity(payload));
+      setActivityUnavailable(false);
+    } catch {
+      setActivityUnavailable(true);
+    }
+  };
+
   onMount(() => {
-    fetchCommits();
-    const interval = setInterval(fetchCommits, POLL_INTERVAL);
+    void fetchCommits();
+    void fetchStreak();
+    void fetchActivity();
+    const interval = setInterval(() => {
+      void fetchCommits();
+      void fetchStreak();
+      void fetchActivity();
+    }, POLL_INTERVAL);
     onCleanup(() => clearInterval(interval));
   });
 
@@ -256,19 +304,76 @@ const RecentCommits: Component = () => {
   return (
     <div class="bg-card border-border relative flex h-full flex-col gap-4 overflow-clip rounded-lg border p-4">
       <div class="relative z-10">
-        <h3 class="text-muted-foreground flex items-center justify-between gap-2 text-xs font-medium tracking-wider uppercase">
+        <h3 class="text-muted-foreground flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-xs font-medium tracking-wider uppercase">
           <span class="flex items-center gap-2">
             <CommitIcon />
             Recent Commits
           </span>
-          <InfoTooltip
-            content="Built with Kronik API and GitHub data"
-            size="16"
-            color="var(--foreground)"
-          />
+          <span class="flex flex-wrap items-center gap-x-3 gap-y-2 tracking-normal normal-case">
+            <Show when={streak()}>
+              {(value) => (
+                <>
+                  <span class="text-foreground inline-flex items-center gap-1.5 text-xs font-medium tabular-nums">
+                    <span
+                      class="group relative inline-flex items-center"
+                      aria-label="Current contribution streak"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="var(--primary)"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                        class="size-4 shrink-0 -translate-y-px"
+                      >
+                        <path d="M12 22c4.4 0 7-3 7-6.5 0-2.5-1.4-4.6-3-6-.2 2-1.2 2.7-2 3-1-3.4-2.7-5.9-5-7.5.4 3-1 5.1-2.3 6.8C5.7 13 5 14.2 5 15.5 5 19 7.6 22 12 22z" />
+                        <path d="M9.5 18.5c0-1.3.9-2.4 2.5-3.5 1.6 1.1 2.5 2.2 2.5 3.5a2.5 2.5 0 0 1-5 0z" />
+                      </svg>
+                      <span class="bg-background text-foreground pointer-events-none absolute top-full right-0 z-20 mt-2 rounded px-2 py-1 text-[0.65rem] font-normal whitespace-nowrap opacity-0 shadow group-hover:opacity-100">
+                        Current contribution streak
+                      </span>
+                    </span>
+                    {value().currentStreak}d
+                  </span>
+                  <span class="text-foreground inline-flex items-center gap-1.5 text-xs font-medium tabular-nums">
+                    <span
+                      class="group relative inline-flex items-center"
+                      aria-label="Longest contribution streak in the past year"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="var(--primary)"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                        class="size-4 shrink-0"
+                      >
+                        <path d="M8 21h8m-4-4v4M7 4h10v5a5 5 0 0 1-10 0V4z" />
+                        <path d="M7 6H4v2a4 4 0 0 0 4 4m9-6h3v2a4 4 0 0 1-4 4" />
+                      </svg>
+                      <span class="bg-background text-foreground pointer-events-none absolute top-full right-0 z-20 mt-2 rounded px-2 py-1 text-[0.65rem] font-normal whitespace-nowrap opacity-0 shadow group-hover:opacity-100">
+                        Longest contribution streak in the past year
+                      </span>
+                    </span>
+                    {value().longestStreak}d
+                  </span>
+                </>
+              )}
+            </Show>
+            <InfoTooltip
+              content="Built with Kronik API and GitHub data"
+              size="16"
+              color="var(--foreground)"
+            />
+          </span>
         </h3>
       </div>
-
       <div class="relative z-10 flex flex-1 flex-col">
         <Switch>
           <Match when={isLoading()}>
@@ -281,7 +386,7 @@ const RecentCommits: Component = () => {
             <EmptyState message="No commit data available." />
           </Match>
           <Match when={commits().length > 0}>
-            <ul aria-label="Recent commits" class="flex flex-col gap-3">
+            <ul aria-label="Recent commits" class="flex flex-col gap-2">
               <For each={commits().slice(0, 5)}>
                 {(commit) => <CommitRow commit={commit} />}
               </For>
@@ -289,6 +394,92 @@ const RecentCommits: Component = () => {
           </Match>
         </Switch>
       </div>
+      <section
+        aria-label="Activity overview"
+        class="border-border relative z-10 flex flex-col gap-3 [border-block-start-width:1px] [padding-block-start:1rem]"
+      >
+        <h4 class="text-foreground text-sm font-semibold">
+          Activity overview{" "}
+          <span class="text-muted-foreground font-normal">· Last 30 days</span>
+        </h4>
+        <Show
+          when={activity()}
+          fallback={
+            <p class="text-muted-foreground text-xs" role="status">
+              {activityUnavailable()
+                ? "Activity overview unavailable right now."
+                : "Loading activity overview…"}
+            </p>
+          }
+        >
+          {(summary) => (
+            <>
+              <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <Show when={summary().languages.length > 0}>
+                  <p class="text-muted-foreground text-xs">
+                    Languages in active repos
+                  </p>
+                </Show>
+                <p class="text-muted-foreground flex flex-wrap gap-x-3 text-xs tabular-nums">
+                  <span>
+                    <span class="sr-only">Additions: </span>
+                    <span class="dark:text-success text-green-800">
+                      +{summary().totals.additions.toLocaleString("en")}
+                    </span>
+                  </span>
+                  <span>
+                    <span class="sr-only">Deletions: </span>
+                    <span class="dark:text-error text-rose-800">
+                      −{summary().totals.deletions.toLocaleString("en")}
+                    </span>
+                  </span>
+                </p>
+              </div>
+              <Show when={summary().languages.length > 0}>
+                <div class="flex flex-col gap-2">
+                  <div
+                    class="relative flex h-2 rounded-full"
+                    aria-hidden="true"
+                  >
+                    <For each={summary().languages}>
+                      {(language, index) => (
+                        <span
+                          class="group relative first:rounded-s-full last:rounded-e-full"
+                          style={{
+                            "flex-grow": language.percentage,
+                            "flex-basis": "0",
+                            "background-color":
+                              LANGUAGE_COLORS[index() % LANGUAGE_COLORS.length],
+                          }}
+                        >
+                          <span
+                            class={`bg-background text-foreground pointer-events-none absolute bottom-full z-20 mb-2 rounded px-2 py-1 text-[0.65rem] whitespace-nowrap opacity-0 shadow transition-opacity duration-150 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100 ${index() === 0 ? "start-0" : "end-0"}`}
+                          >
+                            {language.name}{" "}
+                            {language.percentage.toLocaleString("en", {
+                              maximumFractionDigits: 1,
+                            })}
+                            %
+                          </span>
+                        </span>
+                      )}
+                    </For>
+                  </div>
+                  <ul class="sr-only">
+                    <For each={summary().languages}>
+                      {(language) => (
+                        <li>
+                          {language.name}: {language.percentage}%
+                        </li>
+                      )}
+                    </For>
+                  </ul>
+                </div>
+              </Show>
+            </>
+          )}
+        </Show>
+      </section>
     </div>
   );
 };
