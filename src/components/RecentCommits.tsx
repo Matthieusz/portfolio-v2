@@ -240,11 +240,16 @@ const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
 const RecentCommits: Component = () => {
   const [activity, setActivity] = createSignal<ActivitySummary | null>(null);
   const [activityUnavailable, setActivityUnavailable] = createSignal(false);
-  const visibleLanguages = createMemo(() =>
-    (activity()?.languages ?? []).filter(
-      (language) => language.percentage >= 1,
-    ),
-  );
+  const visibleLanguages = createMemo(() => {
+    const languages = activity()?.languages ?? [];
+    const visible = languages.filter((language) => language.percentage >= 1);
+    const others = languages
+      .filter((language) => language.percentage < 1)
+      .reduce((total, language) => total + language.percentage, 0);
+    return others > 1
+      ? [...visible, { name: "Others", percentage: others }]
+      : visible;
+  });
   const [streak, setStreak] = createSignal<ContributionStreak | null>(null);
   const [data, setData] = createSignal<RecentCommitsData | null>(null);
   const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
