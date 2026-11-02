@@ -15,7 +15,7 @@ const headers = {
 
 const KronikLive = Kronik.layer.pipe(Layer.provide(runtimeConfigLayer));
 
-const statusForError = (error: KronikError): number => {
+export const statusForError = (error: KronikError): number => {
   switch (error._tag) {
     case "KronikConfigurationError":
       return 500;

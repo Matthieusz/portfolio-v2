@@ -5,7 +5,12 @@ import {
   HttpClientRequest,
   HttpClientResponse,
 } from "effect/http";
-import type { RecentCommit, RecentCommitsData } from "./kronik-contract";
+import {
+  ActivitySummary,
+  ContributionStreak,
+  type RecentCommit,
+  type RecentCommitsData,
+} from "./kronik-contract";
 
 const KRONIK_ENDPOINT = "https://kronik.informati.dev/api/v1/users";
 
@@ -17,6 +22,7 @@ const RawCommit = Schema.Struct({
   committedAt: Schema.String,
   additions: Schema.Finite,
   deletions: Schema.Finite,
+  filesChanged: Schema.Int,
 });
 
 interface RawCommit extends Schema.Schema.Type<typeof RawCommit> {}
@@ -89,6 +95,14 @@ export class KronikConfiguration extends Context.Service<
 }
 
 interface KronikService {
+  readonly activity: () => Effect.Effect<
+    ActivitySummary,
+    Exclude<KronikError, KronikConfigurationError>
+  >;
+  readonly streak: () => Effect.Effect<
+    ContributionStreak,
+    Exclude<KronikError, KronikConfigurationError>
+  >;
   readonly recentCommits: (
     limit: number,
   ) => Effect.Effect<
@@ -147,7 +161,63 @@ export class Kronik extends Context.Service<Kronik, KronikService>()(
         return { commits: payload.items.map(normalizeCommit) };
       });
 
-      return Kronik.of({ recentCommits });
+      const streak = Effect.fn("Kronik.streak")(function* () {
+        const operation = "Kronik.streak";
+        const response = yield* client
+          .execute(
+            HttpClientRequest.get(
+              `${KRONIK_ENDPOINT}/${encodeURIComponent(configuration.username)}/streak`,
+            ),
+          )
+          .pipe(
+            Effect.mapError(
+              (cause) => new KronikTransportError({ operation, cause }),
+            ),
+          );
+        if (response.status < 200 || response.status >= 300) {
+          return yield* new KronikResponseError({
+            operation,
+            status: response.status,
+          });
+        }
+        return yield* HttpClientResponse.schemaBodyJson(ContributionStreak)(
+          response,
+        ).pipe(
+          Effect.mapError(
+            (cause) => new KronikDecodeError({ operation, cause }),
+          ),
+        );
+      });
+
+      const activity = Effect.fn("Kronik.activity")(function* () {
+        const operation = "Kronik.activity";
+        const response = yield* client
+          .execute(
+            HttpClientRequest.get(
+              `${KRONIK_ENDPOINT}/${encodeURIComponent(configuration.username)}/activity`,
+            ),
+          )
+          .pipe(
+            Effect.mapError(
+              (cause) => new KronikTransportError({ operation, cause }),
+            ),
+          );
+        if (response.status < 200 || response.status >= 300) {
+          return yield* new KronikResponseError({
+            operation,
+            status: response.status,
+          });
+        }
+        return yield* HttpClientResponse.schemaBodyJson(ActivitySummary)(
+          response,
+        ).pipe(
+          Effect.mapError(
+            (cause) => new KronikDecodeError({ operation, cause }),
+          ),
+        );
+      });
+
+      return Kronik.of({ recentCommits, streak, activity });
     }),
   );
 
@@ -166,4 +236,5 @@ const normalizeCommit = (entry: RawCommit): RecentCommit => ({
   date: entry.committedAt,
   additions: entry.additions,
   deletions: entry.deletions,
+  filesChanged: entry.filesChanged,
 });

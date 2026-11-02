@@ -15,6 +15,91 @@ const testLayer = (fetch: typeof globalThis.fetch) =>
   );
 
 describe("Kronik", () => {
+  it.effect("fetches activity totals, languages and partial coverage", () =>
+    Kronik.use((kronik) => kronik.activity()).pipe(
+      Effect.provide(
+        testLayer(async (input) => {
+          assert.strictEqual(
+            new URL(new Request(input).url).pathname,
+            "/api/v1/users/Matthieusz/activity",
+          );
+          return Response.json({
+            window: { from: "2026-10-01", to: "2026-10-30" },
+            coverage: {
+              complete: false,
+              matchedCommits: 120,
+              aggregatedCommits: 100,
+            },
+            totals: { commits: 100, additions: 200, deletions: 50 },
+            languages: [{ name: "TypeScript", percentage: 75 }],
+          });
+        }),
+      ),
+      Effect.tap((result) =>
+        Effect.sync(() => {
+          assert.strictEqual(result.coverage.complete, false);
+          assert.strictEqual(result.coverage.matchedCommits, 120);
+          assert.strictEqual(result.totals.additions, 200);
+          assert.deepStrictEqual(result.languages, [
+            { name: "TypeScript", percentage: 75 },
+          ]);
+        }),
+      ),
+    ),
+  );
+
+  it.effect("rejects malformed activity data", () =>
+    Kronik.use((kronik) => kronik.activity()).pipe(
+      Effect.provide(
+        testLayer(async () => Response.json({ totals: { commits: "100" } })),
+      ),
+      Effect.flip,
+      Effect.tap((error) =>
+        Effect.sync(() => assert.strictEqual(error._tag, "KronikDecodeError")),
+      ),
+    ),
+  );
+  it.effect(
+    "fetches contribution streaks and rejects malformed responses",
+    () =>
+      Kronik.use((kronik) => kronik.streak()).pipe(
+        Effect.provide(
+          testLayer(async (input) => {
+            assert.strictEqual(
+              new URL(new Request(input).url).pathname,
+              "/api/v1/users/Matthieusz/streak",
+            );
+            return Response.json({
+              currentStreak: 3,
+              longestStreak: 12,
+              active: true,
+            });
+          }),
+        ),
+        Effect.tap((result) =>
+          Effect.sync(() =>
+            assert.deepStrictEqual(result, {
+              currentStreak: 3,
+              longestStreak: 12,
+            }),
+          ),
+        ),
+      ),
+  );
+
+  it.effect("rejects malformed streak data", () =>
+    Kronik.use((kronik) => kronik.streak()).pipe(
+      Effect.provide(
+        testLayer(async () =>
+          Response.json({ currentStreak: "3", longestStreak: 12 }),
+        ),
+      ),
+      Effect.flip,
+      Effect.tap((error) =>
+        Effect.sync(() => assert.strictEqual(error._tag, "KronikDecodeError")),
+      ),
+    ),
+  );
   it.effect(
     "requests public commits without forwarding GitHub credentials",
     () => {
@@ -40,6 +125,7 @@ describe("Kronik", () => {
               committedAt: "2026-10-21T12:00:00Z",
               additions: 12,
               deletions: 3,
+              filesChanged: 2,
             },
           ],
           previous: null,
@@ -61,6 +147,7 @@ describe("Kronik", () => {
                   date: "2026-10-21T12:00:00Z",
                   additions: 12,
                   deletions: 3,
+                  filesChanged: 2,
                 },
               ],
             });

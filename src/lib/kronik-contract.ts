@@ -25,3 +25,37 @@ export const RecentCommitsData = Schema.Struct({
 export interface RecentCommitsData extends Schema.Schema.Type<
   typeof RecentCommitsData
 > {}
+
+/** Contribution streaks measured over GitHub's trailing 365-day calendar. */
+export const ContributionStreak = Schema.Struct({
+  currentStreak: Schema.Int,
+  longestStreak: Schema.Int,
+});
+
+/** Streak data returned to the browser. */
+export interface ContributionStreak extends Schema.Schema.Type<
+  typeof ContributionStreak
+> {}
+
+/** Activity totals and repository language composition for Kronik's default window. */
+export const ActivitySummary = Schema.Struct({
+  window: Schema.Struct({ from: Schema.String, to: Schema.String }),
+  coverage: Schema.Struct({
+    complete: Schema.Boolean,
+    matchedCommits: Schema.Int,
+    aggregatedCommits: Schema.Int,
+  }),
+  totals: Schema.Struct({
+    commits: Schema.Int,
+    additions: Schema.Int,
+    deletions: Schema.Int,
+  }),
+  languages: Schema.Array(
+    Schema.Struct({ name: Schema.String, percentage: Schema.Finite }),
+  ),
+});
+
+/** The activity summary returned to the browser. */
+export interface ActivitySummary extends Schema.Schema.Type<
+  typeof ActivitySummary
+> {}
