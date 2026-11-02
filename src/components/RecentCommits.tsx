@@ -240,6 +240,11 @@ const CommitRow: Component<{ commit: RecentCommit }> = (props) => (
 const RecentCommits: Component = () => {
   const [activity, setActivity] = createSignal<ActivitySummary | null>(null);
   const [activityUnavailable, setActivityUnavailable] = createSignal(false);
+  const visibleLanguages = createMemo(() =>
+    (activity()?.languages ?? []).filter(
+      (language) => language.percentage >= 1,
+    ),
+  );
   const [streak, setStreak] = createSignal<ContributionStreak | null>(null);
   const [data, setData] = createSignal<RecentCommitsData | null>(null);
   const [errorMessage, setErrorMessage] = createSignal<string | null>(null);
@@ -415,7 +420,7 @@ const RecentCommits: Component = () => {
           {(summary) => (
             <>
               <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                <Show when={summary().languages.length > 0}>
+                <Show when={visibleLanguages().length > 0}>
                   <p class="text-muted-foreground text-xs">
                     Languages in active repos
                   </p>
@@ -435,13 +440,13 @@ const RecentCommits: Component = () => {
                   </span>
                 </p>
               </div>
-              <Show when={summary().languages.length > 0}>
+              <Show when={visibleLanguages().length > 0}>
                 <div class="flex flex-col gap-2">
                   <div
                     class="relative flex h-2 rounded-full"
                     aria-hidden="true"
                   >
-                    <For each={summary().languages}>
+                    <For each={visibleLanguages()}>
                       {(language, index) => (
                         <span
                           class="group relative first:rounded-s-full last:rounded-e-full"
@@ -466,7 +471,7 @@ const RecentCommits: Component = () => {
                     </For>
                   </div>
                   <ul class="sr-only">
-                    <For each={summary().languages}>
+                    <For each={visibleLanguages()}>
                       {(language) => (
                         <li>
                           {language.name}: {language.percentage}%
